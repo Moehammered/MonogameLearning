@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Lab01")]
-[assembly: AssemblyProduct("Lab01")]
+[assembly: AssemblyTitle("MouhamadAbdallah_Text_Sound")]
+[assembly: AssemblyProduct("MouhamadAbdallah_Text_Sound")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyDescription("Hello world in monogame to handle text, input, and sound")]
+[assembly: AssemblyCompany("Moehammered")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

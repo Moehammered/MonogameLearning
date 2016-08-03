@@ -35,6 +35,18 @@ namespace MovingTextDemo
             this.right = right;
         }
 
+        public Vector2 Position
+        {
+            get
+            {
+                return displayText.Position;
+            }
+            set
+            {
+                displayText.Position = value;
+            }
+        }
+
         public string Text
         {
             get
