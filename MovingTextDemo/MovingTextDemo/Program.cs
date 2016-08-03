@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lab01
+namespace MovingTextDemo
 {
 #if WINDOWS || LINUX
     /// <summary>

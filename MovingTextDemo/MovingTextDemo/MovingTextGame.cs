@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace Lab01
+namespace MovingTextDemo
 {
     /// <summary>
     /// This is the main type for your game.
@@ -12,15 +12,9 @@ namespace Lab01
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        //displaying text variables
-        private Vector2 textPosition;
-        private SpriteFont font;
-        private string displayText;
-        //colour display variables
-        private Color textColour;
+        //Text2D displayText;
+        MovingText movingText;
         private Color backgroundColour;
-        //text movement variables
-        private float movementSpeed;
         //time tracking between frames
         private float currentTime, previousTime, deltaTime;
         //sound data
@@ -43,11 +37,10 @@ namespace Lab01
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            textPosition = new Vector2(0, 0);
-            displayText = "Moving text!";
-            textColour = Color.White;
+            movingText = new MovingText();
+            //displayText = new Text2D();
+            movingText.Text = "Moving Text";
             backgroundColour = Color.Black;
-            movementSpeed = 100f;
             currentTime = 0;
             previousTime = 0;
             volume = 1;
@@ -63,9 +56,9 @@ namespace Lab01
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
+            movingText.setSpriteBatchReference(ref spriteBatch);
             // TODO: use this.Content to load your game content here
-            font = Content.Load<SpriteFont>("Arial");
+            movingText.Font = Content.Load<SpriteFont>("Arial");
             //loading sound data/file
             moveSoundData = Content.Load<SoundEffect>("spray");
             ambientSoundData = Content.Load<SoundEffect>("track");
@@ -104,7 +97,8 @@ namespace Lab01
             //tick the time between frames to capture deltaTime
             tickTime(gameTime);
             //check for inputs and act accordingly
-            checkMovementKeys(deltaTime);
+            //checkMovementKeys(deltaTime);
+            movingText.update(deltaTime);
             //check if any movement keys are held to change the display text and play sound
             checkForKeysHeld();
             // TODO: Add your update logic here
@@ -116,8 +110,7 @@ namespace Lab01
         {
             currentTime = (float)time.TotalGameTime.TotalMilliseconds/1000f;
             deltaTime = currentTime - previousTime;
-
-            System.Diagnostics.Trace.WriteLine("Current Time: " + currentTime + " | Delta: " + deltaTime + " | Prev: " + previousTime);
+            //System.Diagnostics.Trace.WriteLine("Current Time: " + currentTime + " | Delta: " + deltaTime + " | Prev: " + previousTime);
             previousTime = currentTime;
         }
 
@@ -125,7 +118,7 @@ namespace Lab01
         {
             Keys[] held = Keyboard.GetState().GetPressedKeys();
             //reset the string value
-            displayText = "Still text...";
+            movingText.Text = "Still text...";
             //are any keys held?
             if(held.Length > 0)
             {
@@ -138,7 +131,7 @@ namespace Lab01
                         case Keys.S:
                         case Keys.A:
                         case Keys.D:
-                            displayText = "I'm moving now!";
+                            movingText.Text = "I'm moving now!";
                             if(movementSound.State != SoundState.Playing)
                                 movementSound.Play();
                         break;
@@ -147,26 +140,6 @@ namespace Lab01
                         break;
                     }
                 }
-            }
-        }
-
-        private void checkMovementKeys(float deltaTime)
-        {
-            if (Keyboard.GetState().IsKeyDown(Keys.D))
-            {
-                textPosition.X += movementSpeed * deltaTime;
-            }
-            else if (Keyboard.GetState().IsKeyDown(Keys.A))
-            {
-                textPosition.X -= movementSpeed * deltaTime;
-            }
-            if (Keyboard.GetState().IsKeyDown(Keys.W))
-            {
-                textPosition.Y -= movementSpeed * deltaTime;
-            }
-            else if (Keyboard.GetState().IsKeyDown(Keys.S))
-            {
-                textPosition.Y += movementSpeed * deltaTime;
             }
         }
 
@@ -180,8 +153,9 @@ namespace Lab01
 
             // TODO: Add your drawing code here
             spriteBatch.Begin();
-            spriteBatch.DrawString(font, "Curr: " + currentTime, new Vector2(300, 0), Color.Red);
-            spriteBatch.DrawString(font, displayText, textPosition, textColour);
+            /*spriteBatch.DrawString(displayText.Font, "Curr: " + currentTime, new Vector2(300, 0), Color.Red);
+            spriteBatch.DrawString(displayText.Font, displayText.Text, displayText.Position, displayText.Colour);*/
+            movingText.draw();
             spriteBatch.End();
             base.Draw(gameTime);
         }

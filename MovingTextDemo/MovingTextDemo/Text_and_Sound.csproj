@@ -9,8 +9,8 @@
     <ProjectGuid>{DF0546B9-B138-402A-88C2-D69E95CCD786}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Lab01</RootNamespace>
-    <AssemblyName>Lab01</AssemblyName>
+    <RootNamespace>MovingTextDemo</RootNamespace>
+    <AssemblyName>MovingTextDemo</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MonoGamePlatform>Windows</MonoGamePlatform>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -38,6 +38,8 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="MovingText.cs" />
+    <Compile Include="Text2D.cs" />
     <Compile Include="MovingTextGame.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
