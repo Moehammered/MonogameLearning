@@ -15,6 +15,9 @@ namespace Cameras_and_Primitives
 
         Camera camera;
         PrimitiveMesh mesh;
+        TriangleMesh triangle;
+        SquareMesh square;
+        HexagonMesh hexagon;
 
         BasicEffect basicEffect;
 
@@ -45,6 +48,17 @@ namespace Cameras_and_Primitives
             setupRasterisation();
             //create our basic effect(which I am thinking more and more is a shader or material)
             setupBasicEffect();
+
+            triangle = new TriangleMesh(GraphicsDevice);
+
+            square = new SquareMesh(GraphicsDevice);
+            square.setColour(Color.Blue);
+            square.updateMesh();
+
+            hexagon = new HexagonMesh(GraphicsDevice);
+            hexagon.setColour(Color.Purple);
+            hexagon.Radius = 0.5f;
+            hexagon.updateMesh();
 
             base.Initialize();
         }
@@ -92,7 +106,7 @@ namespace Cameras_and_Primitives
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-
+            basicEffect.World = Matrix.Identity;
             // TODO: Add your drawing code here
             /*foreach(EffectPass pass in basicEffect.CurrentTechnique.Passes)
             {
@@ -100,6 +114,21 @@ namespace Cameras_and_Primitives
                 mesh.draw();
             }*/
             mesh.draw(basicEffect.CurrentTechnique.Passes);
+            //position and draw the triangle
+            Vector3 pos = basicEffect.World.Translation;
+            pos.X = -3;
+            basicEffect.World *= Matrix.CreateTranslation(pos);
+            triangle.draw(basicEffect.CurrentTechnique.Passes);
+            //position and draw the square
+            pos.Y = -3;
+            basicEffect.World = Matrix.Identity;
+            basicEffect.World *= Matrix.CreateTranslation(pos);
+            square.draw(basicEffect.CurrentTechnique.Passes);
+            //position and draw the hexagon
+            pos.X = 3;
+            basicEffect.World = Matrix.Identity;
+            basicEffect.World *= Matrix.CreateTranslation(pos);
+            hexagon.draw(basicEffect.CurrentTechnique.Passes);
 
             base.Draw(gameTime);
         }
@@ -128,6 +157,7 @@ namespace Cameras_and_Primitives
         {
             RasterizerState rasterState = new RasterizerState();
             rasterState.CullMode = CullMode.CullCounterClockwiseFace;
+            rasterState.FillMode = FillMode.Solid;
             GraphicsDevice.RasterizerState = rasterState;
         }
 

@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 
 namespace Cameras_and_Primitives
 {
@@ -32,7 +31,7 @@ namespace Cameras_and_Primitives
             indices = new ushort[0];
         }
 
-        public VertexPositionColor[] Vertices
+        public virtual VertexPositionColor[] Vertices
         {
             get { return vertices; }
             set
@@ -52,7 +51,13 @@ namespace Cameras_and_Primitives
             }
         }
 
-        public ushort[] Indices
+        /// <summary>
+        /// The indices of the vertices to be used when rendering.
+        /// If rendering as a triangle strip, back-face culling is flipped automatically for every 2nd triangle.
+        /// I.E. You do not have to account for back face winding or use de-generative triangles to order vertices.
+        /// If rendering as a triangle list, each triangle must be ordered correctly.
+        /// </summary>
+        public virtual ushort[] Indices
         {
             get { return indices; }
             set
@@ -61,7 +66,7 @@ namespace Cameras_and_Primitives
                 if(value != null)
                 {
                     indexCount = (ushort)indices.Length;
-                    triangleCount = indexCount / 3;
+                    triangleCount = (triangleType == PrimitiveType.TriangleList) ? indexCount / 3 : indexCount - 2;
                     indexBuffer = new IndexBuffer(gfxDevice, typeof(ushort), indexCount, BufferUsage.WriteOnly);
                     indexBuffer.SetData<ushort>(indices);
                 }
