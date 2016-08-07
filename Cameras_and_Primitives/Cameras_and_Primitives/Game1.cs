@@ -8,25 +8,14 @@ namespace Cameras_and_Primitives
     /// This is the main type for your game.
     /// </summary>
     /// 
-
-    public struct RenderMatrices
-    {
-        public Matrix world, projection, view;
-    };
-
     public class Game1 : Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        //camera values
-        RenderMatrices matrices;
-        float FOV, aspectRatio, near, far;
-        Vector3 camPosition;
-        //primitive values and rendering
-        VertexBuffer vertexBuffer;
-        IndexBuffer indexBuffer;
-        VertexPositionColor[] vertices;
-        short[] indices;
+
+        Camera camera;
+        PrimitiveMesh mesh;
+
         BasicEffect basicEffect;
 
         public Game1()
@@ -44,17 +33,19 @@ namespace Cameras_and_Primitives
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            camPosition = new Vector3(0, 0, 10);
-            FOV = 45;
-            aspectRatio = (float)graphics.PreferredBackBufferWidth / (float)graphics.PreferredBackBufferHeight;
-            near = 0.1f;
-            far = 1000f;
-            setupCamera(camPosition);
-            setupVertexBuffer();
-            setupIndexBuffer();
+            //create the camera
+            camera = new Camera();
+            camera.FieldOfView = 45;
+            camera.setAspectRatio((float)graphics.PreferredBackBufferWidth, (float)graphics.PreferredBackBufferHeight);
+            camera.setClippingPlanes(0.1f, 1000f);
+            camera.Position = new Vector3(0, 0, 10);
+            //create the mesh
+            setupMesh();
             //sets up the culling property of the graphics card
             setupRasterisation();
+            //create our basic effect(which I am thinking more and more is a shader or material)
             setupBasicEffect();
+
             base.Initialize();
         }
 
@@ -103,39 +94,34 @@ namespace Cameras_and_Primitives
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // TODO: Add your drawing code here
-            drawPrimitive();
+            /*foreach(EffectPass pass in basicEffect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                mesh.draw();
+            }*/
+            mesh.draw(basicEffect.CurrentTechnique.Passes);
+
             base.Draw(gameTime);
         }
 
-        private void setupCamera(Vector3 position)
+        private void setupMesh()
         {
-            matrices.projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(FOV), aspectRatio, near, far);
-            matrices.world = Matrix.CreateTranslation(Vector3.Zero);
-            matrices.view = Matrix.CreateLookAt(position, Vector3.Zero, Vector3.Up);
-        }
+            mesh = new PrimitiveMesh(GraphicsDevice);
 
-        private void setupVertexBuffer()
-        {
             //create the vertices of the mesh primitive to hold position and colour data
-            vertices = new VertexPositionColor[3];
+            VertexPositionColor[] vertices = new VertexPositionColor[3];
             //vertex winding order is Clockwise
             vertices[0] = new VertexPositionColor(new Vector3(-0.5f, 0, 0), Color.Red);
             vertices[1] = new VertexPositionColor(new Vector3(0, 1, 0), Color.Green);
             vertices[2] = new VertexPositionColor(new Vector3(0.5f, 0, 0), Color.Blue);
-            //Create the vertexbuffer and supply the vertices to it
-            vertexBuffer = new VertexBuffer(GraphicsDevice, typeof(VertexPositionColor), 3, BufferUsage.WriteOnly);
-            vertexBuffer.SetData<VertexPositionColor>(vertices);
-        }
+            mesh.Vertices = vertices;
 
-        private void setupIndexBuffer()
-        {
-            indices = new short[3];
+            //create the indices of the vertices to make up the primitive
+            ushort[] indices = new ushort[3];
             indices[0] = 0;
             indices[1] = 1;
             indices[2] = 2;
-
-            indexBuffer = new IndexBuffer(GraphicsDevice, typeof(short), 3, BufferUsage.WriteOnly);
-            indexBuffer.SetData<short>(indices);
+            mesh.Indices = indices;
         }
 
         private void setupRasterisation()
@@ -150,24 +136,10 @@ namespace Cameras_and_Primitives
             //instantiate what I assume is a shader object?
             basicEffect = new BasicEffect(GraphicsDevice);
             //setup the rendering data for this effect (shader I think...)
-            basicEffect.World = matrices.world;
-            basicEffect.View = matrices.view;
-            basicEffect.Projection = matrices.projection;
+            basicEffect.World = camera.World;
+            basicEffect.View = camera.View;
+            basicEffect.Projection = camera.Projection;
             basicEffect.VertexColorEnabled = true;
-        }
-
-        private void drawPrimitive()
-        {
-            GraphicsDevice.SetVertexBuffer(vertexBuffer);
-            GraphicsDevice.Indices = indexBuffer;
-
-            foreach(EffectPass pass in basicEffect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-                //no indices
-                //GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 1);
-                GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 1);
-            }
         }
     }
 }
