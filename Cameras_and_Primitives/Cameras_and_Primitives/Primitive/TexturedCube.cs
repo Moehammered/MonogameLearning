@@ -8,6 +8,7 @@ namespace Cameras_and_Primitives
     {
         private float width, height, depth;
         private StaticPrimitiveMesh mesh;
+        //Not used yet
         private Texture2D texture;
 
         public TexturedCube()
@@ -51,7 +52,6 @@ namespace Cameras_and_Primitives
                 }
                 vertices[i] = new VertexData(positions[i], normals[i], uvs[i]);
                 vertices[i].colour = colour;
-                System.Diagnostics.Trace.WriteLine(vertices[i]);
             }
 
             mesh.Vertices = vertices;

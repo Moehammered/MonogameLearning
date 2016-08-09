@@ -88,31 +88,7 @@ namespace Cameras_and_Primitives
             this.uv = Vector2.Zero;
             this.colour = colour;
         }
-
-        //public Vector3 Position
-        //{
-        //    get { return position; }
-        //    set { position = value; }
-        //}
-
-        //public Vector2 Normal
-        //{
-        //    get { return normal; }
-        //    set { normal = value; }
-        //}
-
-        //public Vector2 UV
-        //{
-        //    get { return uv; }
-        //    set { uv = value; }
-        //}
-
-        //public Color Colour
-        //{
-        //    get { return colour; }
-        //    set { colour = value; }
-        //}
-
+        
         public override string ToString()
         {
             string formatted = "Pos[" + position + "] | ";

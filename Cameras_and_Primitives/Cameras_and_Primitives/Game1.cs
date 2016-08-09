@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MovingTextDemo;
 
 namespace Cameras_and_Primitives
 {
@@ -15,12 +16,15 @@ namespace Cameras_and_Primitives
         
         Camera camera;
         TexturedCube cube;
-        StaticSquareMesh square;
         Texture2D texture;
-        PrimitiveTestGame primitiveTest;
         BasicEffect be;
-        float xRotation, yRotation, zPos;
-
+        float xRotation, yRotation, scale;
+        Time timer;
+        //mouse movement variables
+        Vector2 lastMousePos, currMousePos;
+        int lastScrollPos;
+        float mouseSensitivity = 10;
+        
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -36,25 +40,28 @@ namespace Cameras_and_Primitives
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            primitiveTest = new PrimitiveTestGame(GraphicsDevice, graphics);
-            //primitiveTest.initialise();
-
             camera = new Camera();
             camera.FieldOfView = 45;
             camera.setAspectRatio((float)graphics.PreferredBackBufferWidth, (float)graphics.PreferredBackBufferHeight);
             camera.setClippingPlanes(0.1f, 1000f);
             camera.Position = new Vector3(0, 0, 5);
 
-            cube = new TexturedCube();
             texture = Content.Load<Texture2D>("crate");
+            cube = new TexturedCube();
             cube.initialise(GraphicsDevice, texture);
 
-            square = new StaticSquareMesh(GraphicsDevice);
-
+            //setup default values for rotation and scale matrices
             xRotation = yRotation = 0;
+            scale = 1;
 
+            //setup the shader to have lighting and texturing enabled
             setupBasicEffect();
+            //setup backface culling
             setupRasterisation();
+            //get an instance of the Time class to be able to start tracking deltaTime.
+            timer = Time.Instance;
+            //get the initial position of the scroll wheel
+            lastScrollPos = Mouse.GetState().ScrollWheelValue;
 
             base.Initialize();
         }
@@ -90,20 +97,12 @@ namespace Cameras_and_Primitives
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
-            //primitiveTest.update(gameTime);
-            if(Keyboard.GetState().IsKeyDown(Keys.W))
-                xRotation += gameTime.ElapsedGameTime.Milliseconds / 10f;
-            else if(Keyboard.GetState().IsKeyDown(Keys.S))
-                xRotation -= gameTime.ElapsedGameTime.Milliseconds / 10f;
-            if (Keyboard.GetState().IsKeyDown(Keys.E))
-                yRotation += gameTime.ElapsedGameTime.Milliseconds / 12f;
-            else if (Keyboard.GetState().IsKeyDown(Keys.Q))
-                yRotation -= gameTime.ElapsedGameTime.Milliseconds / 12f;
-            if (Keyboard.GetState().IsKeyDown(Keys.I))
-                zPos += gameTime.ElapsedGameTime.Milliseconds / 100f;
-            else if (Keyboard.GetState().IsKeyDown(Keys.P))
-                zPos -= gameTime.ElapsedGameTime.Milliseconds / 100f;
+            //track deltatime
+            timer.tick(ref gameTime);
+            //check for left mouse button or scroll wheel movement and move accordingly
+            processMouse();
+            //keep track of the mouse's last position
+            lastMousePos = Mouse.GetState().Position.ToVector2();
 
             base.Update(gameTime);
         }
@@ -116,19 +115,42 @@ namespace Cameras_and_Primitives
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            be.World = Matrix.Identity * Matrix.CreateRotationX(MathHelper.ToRadians(xRotation))
-                * Matrix.CreateRotationY(MathHelper.ToRadians(yRotation)) * Matrix.CreateTranslation(0, 0, zPos);
+            /*be.World = Matrix.Identity * Matrix.CreateRotationX(MathHelper.ToRadians(xRotation))
+                * Matrix.CreateRotationY(MathHelper.ToRadians(yRotation)) * Matrix.CreateTranslation(0, 0, zPos);*/
             
+            //create the matrices responsible for transforming the cube
+            Matrix xRot = Matrix.CreateRotationX(MathHelper.ToRadians(xRotation));
+            Matrix yRot = Matrix.CreateRotationY(MathHelper.ToRadians(yRotation));
+            Matrix translation = Matrix.CreateTranslation(Vector3.Zero); //not necessary but there for completion sake.
+            Matrix cubeScale = Matrix.CreateScale(scale);
+
+            //set the current world/modelview matrix to be ready for the cube
+            be.World = Matrix.Identity * xRot * yRot * cubeScale * translation;
+            //render the cube
             renderScene();
-            //renderWireframe();
 
             base.Draw(gameTime);
         }
 
+        private void processMouse()
+        {
+            if(Mouse.GetState().LeftButton == ButtonState.Pressed)
+            {
+                currMousePos = Mouse.GetState().Position.ToVector2();
+                Vector2 delta = currMousePos - lastMousePos;
+                xRotation += delta.Y * timer.DeltaTime * mouseSensitivity;
+                yRotation += delta.X * timer.DeltaTime * mouseSensitivity;
+            }
+            if (Mouse.GetState().ScrollWheelValue != lastScrollPos)
+            {
+                int scrollValue = Mouse.GetState().ScrollWheelValue;
+                scale += timer.DeltaTime * MathHelper.Clamp(scrollValue - lastScrollPos, -1, 1) * mouseSensitivity;
+                lastScrollPos = scrollValue;
+            }
+        }
+
         private void renderScene()
         {
-            //primitiveTest.draw();
-
             foreach (EffectPass pass in be.CurrentTechnique.Passes)
             {
                 pass.Apply();
@@ -159,16 +181,10 @@ namespace Cameras_and_Primitives
         {
             //instantiate what I assume is a shader object?
             be = new BasicEffect(GraphicsDevice);
-            
             be.TextureEnabled = true;
             be.Texture = texture;
             be.LightingEnabled = true;
             be.EnableDefaultLighting();
-            /*be.DirectionalLight0.Enabled = true;
-            be.DirectionalLight0.Direction = new Vector3(-1, -1, 0);
-            be.DirectionalLight0.DiffuseColor = Vector3.One;
-            be.LightingEnabled = true;
-            be.AmbientLightColor = Vector3.One / 4f;*/
             //setup the rendering data for this effect (shader I think...)
             be.World = camera.World;
             be.View = camera.View;
