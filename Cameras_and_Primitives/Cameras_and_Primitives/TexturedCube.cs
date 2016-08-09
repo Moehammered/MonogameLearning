@@ -24,11 +24,11 @@ namespace Cameras_and_Primitives
             Vector3[] normals = buildNormals();
             Vector2[] uvs = buildUVs();
 
-            Color colour = Color.Red;
+            Color colour = Color.White;
 
             for(int i = 0; i < vertices.Length; i++)
             {
-                /*switch (i)
+                switch (i)
                 {
                     case 0: //front
                         colour = Color.White;
@@ -48,7 +48,7 @@ namespace Cameras_and_Primitives
                     case 30: //bottom
                         colour = Color.Gray;
                         break;
-                }*/
+                }
                 vertices[i] = new VertexData(positions[i], normals[i], uvs[i]);
                 vertices[i].colour = colour;
                 System.Diagnostics.Trace.WriteLine(vertices[i]);

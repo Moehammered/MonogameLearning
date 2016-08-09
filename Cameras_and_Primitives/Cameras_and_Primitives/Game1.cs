@@ -12,7 +12,7 @@ namespace Cameras_and_Primitives
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-
+        
         Camera camera;
         TexturedCube cube;
         StaticSquareMesh square;
@@ -118,12 +118,7 @@ namespace Cameras_and_Primitives
 
             be.World = Matrix.Identity * Matrix.CreateRotationX(MathHelper.ToRadians(xRotation))
                 * Matrix.CreateRotationY(MathHelper.ToRadians(yRotation)) * Matrix.CreateTranslation(0, 0, zPos);
-            be.View = camera.View;
-            be.Projection = camera.Projection;
             
-            be.EnableDefaultLighting();
-            be.LightingEnabled = true;
-
             renderScene();
             //renderWireframe();
 
@@ -165,20 +160,19 @@ namespace Cameras_and_Primitives
             //instantiate what I assume is a shader object?
             be = new BasicEffect(GraphicsDevice);
             
-            /*be.TextureEnabled = true;
+            be.TextureEnabled = true;
             be.Texture = texture;
             be.LightingEnabled = true;
-            be.EnableDefaultLighting();*/
+            be.EnableDefaultLighting();
             /*be.DirectionalLight0.Enabled = true;
             be.DirectionalLight0.Direction = new Vector3(-1, -1, 0);
             be.DirectionalLight0.DiffuseColor = Vector3.One;
             be.LightingEnabled = true;
             be.AmbientLightColor = Vector3.One / 4f;*/
             //setup the rendering data for this effect (shader I think...)
-            //be.World = camera.World;
-            //be.View = camera.View;
-            //be.Projection = camera.Projection;
-            //be.VertexColorEnabled = true;
+            be.World = camera.World;
+            be.View = camera.View;
+            be.Projection = camera.Projection;
         }
 
     }

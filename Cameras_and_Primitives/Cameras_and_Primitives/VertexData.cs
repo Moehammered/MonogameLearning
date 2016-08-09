@@ -17,7 +17,7 @@ namespace Cameras_and_Primitives
         //a decleration of what is contained within the Vertex and it's formatting
         public readonly static VertexDeclaration Decleration = new VertexDeclaration(
             new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
-            new VertexElement(12, VertexElementFormat.Vector2, VertexElementUsage.Normal, 0),
+            new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0),
             new VertexElement(24, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
             new VertexElement(32, VertexElementFormat.Color, VertexElementUsage.Color, 0)
         );
