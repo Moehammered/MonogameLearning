@@ -104,9 +104,13 @@ namespace Cameras_and_Primitives
         {
             VertexData[] verts = new VertexData[4];
             verts[0] = new VertexData(new Vector3(-width/2f, height / 2f, 0), colours[0]);
+            verts[0].normal = new Vector3(1, 0, 0);
             verts[1] = new VertexData(new Vector3(width / 2f, height / 2f, 0), colours[1]);
+            verts[1].normal = new Vector3(1, 0, 0);
             verts[2] = new VertexData(new Vector3(width / 2f, -height / 2f, 0), colours[2]);
+            verts[2].normal = new Vector3(1, 0, 0);
             verts[3] = new VertexData(new Vector3(-width / 2f, -height / 2f, 0), colours[3]);
+            verts[3].normal = new Vector3(1, 0, 0);
 
             ushort[] ind = new ushort[4] {
                 3, 0, 2,    //face 1

@@ -113,6 +113,15 @@ namespace Cameras_and_Primitives
         //    set { colour = value; }
         //}
 
+        public override string ToString()
+        {
+            string formatted = "Pos[" + position + "] | ";
+            formatted += "Norm[" + normal + "] | ";
+            formatted += "UV[" + uv + "] | ";
+            formatted += "Col[" + colour + "]";
+            return formatted;
+        }
+
         //The accessor method of this interface that is used to figure out what this vertex looks like
         VertexDeclaration IVertexType.VertexDeclaration
         {

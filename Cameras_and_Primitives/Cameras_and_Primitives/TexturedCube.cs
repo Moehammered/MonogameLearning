@@ -18,9 +18,50 @@ namespace Cameras_and_Primitives
         public void initialise(GraphicsDevice gd, Texture2D texture)
         {
             mesh = new StaticPrimitiveMesh(gd);
-            //buildVertices();
-            //buildIndices();
+            mesh.useTriangleList();
+            VertexData[] vertices = new VertexData[36];
+            Vector3[] positions = buildPoint();
+            Vector3[] normals = buildNormals();
+            Vector2[] uvs = buildUVs();
+
+            Color colour = Color.Red;
+
+            for(int i = 0; i < vertices.Length; i++)
+            {
+                /*switch (i)
+                {
+                    case 0: //front
+                        colour = Color.White;
+                        break;
+                    case 6: //back
+                        colour = Color.Red;
+                        break;
+                    case 12: //right
+                        colour = Color.Blue;
+                        break;
+                    case 18: //left
+                        colour = Color.Yellow;
+                        break;
+                    case 24: //top
+                        colour = Color.Green;
+                        break;
+                    case 30: //bottom
+                        colour = Color.Gray;
+                        break;
+                }*/
+                vertices[i] = new VertexData(positions[i], normals[i], uvs[i]);
+                vertices[i].colour = colour;
+                System.Diagnostics.Trace.WriteLine(vertices[i]);
+            }
+
+            mesh.Vertices = vertices;
+            mesh.Indices = buildIndices();
             this.texture = texture;
+        }
+
+        public void draw()
+        {
+            mesh.draw();
         }
 
         private Vector3[] buildPoint()
@@ -60,7 +101,7 @@ namespace Cameras_and_Primitives
                         points.InsertRange(points.Count, buildFace(FTR, BTR, BBR, FBR));
                         break;
                     case 18:    //construct left face
-                        points.InsertRange(points.Count, buildFace(BTL, FTL, FBR, BBR));
+                        points.InsertRange(points.Count, buildFace(BTL, FTL, FBL, BBL));
                         break;
                     case 24:    //construct top face
                         points.InsertRange(points.Count, buildFace(BTL, BTR, FTR, FTL));
@@ -79,7 +120,7 @@ namespace Cameras_and_Primitives
         private ushort[] buildIndices()
         {
             ushort[] indices = new ushort[36];
-            for(ushort i = 0; i < 36; i++)
+            for(ushort i = 0; i < indices.Length; i++)
             {
                 indices[i] = i;
             }
@@ -96,7 +137,7 @@ namespace Cameras_and_Primitives
             Vector3[] normals = new Vector3[36];
             for(int i = 0; i < normals.Length; i++)
             {
-                Vector3 normal = Vector3.Zero;
+                Vector3 normal = Vector3.One;
 
                 //check which face we are on
                 if (i < 6)
@@ -111,7 +152,6 @@ namespace Cameras_and_Primitives
                     normal = topFace;
                 else
                     normal = -topFace;
-
                 normals[i] = normal;
             }
 
@@ -120,11 +160,44 @@ namespace Cameras_and_Primitives
 
         private Vector2[] buildUVs()
         {
-            Vector2[] uvs = new Vector2[36];
-
+            List<Vector2> uvs = new List<Vector2>(36);
             //fill in the gap.
+            float xSegment = 1 / 2f;
+            float ySegment = 1 / 2f;
+            Vector2 uvStart = Vector2.Zero;
+            Vector2 uvEnd = Vector2.Zero;
 
-            return uvs;
+            for(int i = 0; i < uvs.Capacity; i+=6)
+            {
+                switch(i)
+                {
+                    case 0:
+                        uvEnd.X = xSegment;
+                        uvEnd.Y = ySegment;
+                        break;
+                    case 12:
+                        uvStart.X = xSegment;
+                        uvEnd.X = xSegment * 2;
+                        break;
+                    case 24:
+                        uvStart.X = 0;
+                        uvStart.Y = ySegment;
+
+                        uvEnd.X = xSegment;
+                        uvEnd.Y = ySegment * 2;
+                        break;
+                    case 30:
+                        uvStart.X = xSegment;
+                        uvEnd.X = xSegment * 2;
+                        break;
+                    default:
+                        break;
+                }
+
+                uvs.InsertRange(uvs.Count, buildFaceUVS(uvStart, uvEnd));
+            }
+
+            return uvs.ToArray();
         }
 
         private Vector3[] buildFace(Vector3 tl, Vector3 tr, Vector3 br, Vector3 bl)
@@ -140,6 +213,21 @@ namespace Cameras_and_Primitives
             points[5] = bl;
 
             return points;
+        }
+
+        private Vector2[] buildFaceUVS(Vector2 start, Vector2 end)
+        {
+            Vector2[] uvs = new Vector2[6];
+            //triangle 1 - left tri
+            uvs[0] = start;
+            uvs[1] = new Vector2(end.X, start.Y);
+            uvs[2] = new Vector2(start.X, end.Y);
+            //triangle 2 - right tri
+            uvs[3] = uvs[1];
+            uvs[4] = end;
+            uvs[5] = uvs[2];
+
+            return uvs;
         }
     }
 }
