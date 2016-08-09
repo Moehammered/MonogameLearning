@@ -3,12 +3,12 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Cameras_and_Primitives
 {
-    class SquareMesh : PrimitiveMesh
+    class StaticSquareMesh : StaticPrimitiveMesh
     {
         private float width, height;
         private Color[] colours;
 
-        public SquareMesh(GraphicsDevice gd) : base(gd)
+        public StaticSquareMesh(GraphicsDevice gd) : base(gd)
         {
             width = 1;
             height = 1;
@@ -19,7 +19,7 @@ namespace Cameras_and_Primitives
         /// <summary>
         /// Returns the triangles vertices. They cannot be modified.
         /// </summary>
-        public new VertexPositionColor[] Vertices
+        public new VertexData[] Vertices
         {
             get
             {
@@ -87,26 +87,26 @@ namespace Cameras_and_Primitives
         public void updateMesh()
         {
             //update the positions
-            vertices[0].Position = new Vector3(-width / 2f, height / 2f, 0);
-            vertices[1].Position = new Vector3(width / 2f, height / 2f, 0);
-            vertices[2].Position = new Vector3(width / 2f, -height / 2f, 0);
-            vertices[3].Position = new Vector3(-width / 2f, -height / 2f, 0);
+            vertices[0].position = new Vector3(-width / 2f, height / 2f, 0);
+            vertices[1].position = new Vector3(width / 2f, height / 2f, 0);
+            vertices[2].position = new Vector3(width / 2f, -height / 2f, 0);
+            vertices[3].position = new Vector3(-width / 2f, -height / 2f, 0);
             //update the colours
-            vertices[0].Color = colours[0];
-            vertices[1].Color = colours[1];
-            vertices[2].Color = colours[2];
-            vertices[3].Color = colours[3];
+            vertices[0].colour = colours[0];
+            vertices[1].colour = colours[1];
+            vertices[2].colour = colours[2];
+            vertices[3].colour = colours[3];
 
-            buffer.SetData<VertexPositionColor>(vertices);
+            buffer.SetData<VertexData>(vertices);
         }
 
         private void initialiseSquare()
         {
-            VertexPositionColor[] verts = new VertexPositionColor[4];
-            verts[0] = new VertexPositionColor(new Vector3(-width/2f, height / 2f, 0), colours[0]);
-            verts[1] = new VertexPositionColor(new Vector3(width / 2f, height / 2f, 0), colours[1]);
-            verts[2] = new VertexPositionColor(new Vector3(width / 2f, -height / 2f, 0), colours[2]);
-            verts[3] = new VertexPositionColor(new Vector3(-width / 2f, -height / 2f, 0), colours[3]);
+            VertexData[] verts = new VertexData[4];
+            verts[0] = new VertexData(new Vector3(-width/2f, height / 2f, 0), colours[0]);
+            verts[1] = new VertexData(new Vector3(width / 2f, height / 2f, 0), colours[1]);
+            verts[2] = new VertexData(new Vector3(width / 2f, -height / 2f, 0), colours[2]);
+            verts[3] = new VertexData(new Vector3(-width / 2f, -height / 2f, 0), colours[3]);
 
             ushort[] ind = new ushort[4] {
                 3, 0, 2,    //face 1

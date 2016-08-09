@@ -40,12 +40,14 @@
   <ItemGroup>
     <Compile Include="Camera.cs" />
     <Compile Include="Game1.cs" />
-    <Compile Include="HexagonMesh.cs" />
-    <Compile Include="PrimitiveMesh.cs" />
+    <Compile Include="StaticHexagonMesh.cs" />
+    <Compile Include="StaticCubeMesh.cs" />
+    <Compile Include="StaticPrimitiveMesh.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SquareMesh.cs" />
-    <Compile Include="TriangleMesh.cs" />
+    <Compile Include="StaticSquareMesh.cs" />
+    <Compile Include="StaticTriangleMesh.cs" />
+    <Compile Include="VertexData.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

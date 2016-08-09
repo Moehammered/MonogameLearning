@@ -7,12 +7,12 @@ namespace Cameras_and_Primitives
     /// Has a vertex limit of the maximum value of an unsigned short(65535).
     /// For now it uses coloured vertices, but later will be updated to use UV's and normals too.
     /// </summary>
-    class PrimitiveMesh
+    class StaticPrimitiveMesh
     {
         protected VertexBuffer buffer;
         protected IndexBuffer indexBuffer;
 
-        protected VertexPositionColor[] vertices;
+        protected VertexData[] vertices;
         protected ushort[] indices;
         protected ushort vertexCount;
         protected ushort indexCount;
@@ -24,14 +24,14 @@ namespace Cameras_and_Primitives
         /// <summary>
         /// Instantiates a primitive mesh with no data specified
         /// </summary>
-        public PrimitiveMesh(GraphicsDevice gd)
+        public StaticPrimitiveMesh(GraphicsDevice gd)
         {
             gfxDevice = gd;
-            vertices = new VertexPositionColor[0];
+            vertices = new VertexData[0];
             indices = new ushort[0];
         }
 
-        public virtual VertexPositionColor[] Vertices
+        public virtual VertexData[] Vertices
         {
             get { return vertices; }
             set
@@ -40,8 +40,8 @@ namespace Cameras_and_Primitives
                 if(value != null)
                 {
                     vertexCount = (ushort)vertices.Length;
-                    buffer = new VertexBuffer(gfxDevice, typeof(VertexPositionColor), vertexCount, BufferUsage.WriteOnly);
-                    buffer.SetData<VertexPositionColor>(vertices);
+                    buffer = new VertexBuffer(gfxDevice, typeof(VertexData), vertexCount, BufferUsage.WriteOnly);
+                    buffer.SetData<VertexData>(vertices);
                 }
                 else
                 {

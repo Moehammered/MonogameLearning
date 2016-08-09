@@ -14,12 +14,15 @@ namespace Cameras_and_Primitives
         SpriteBatch spriteBatch;
 
         Camera camera;
-        PrimitiveMesh mesh;
-        TriangleMesh triangle;
-        SquareMesh square;
-        HexagonMesh hexagon;
+        StaticPrimitiveMesh mesh;
+        StaticTriangleMesh triangle;
+        StaticSquareMesh square;
+        StaticHexagonMesh hexagon;
+        StaticCubeMesh cube;
 
         BasicEffect basicEffect;
+
+        float rot = 0;
 
         public Game1()
         {
@@ -49,16 +52,18 @@ namespace Cameras_and_Primitives
             //create our basic effect(which I am thinking more and more is a shader or material)
             setupBasicEffect();
 
-            triangle = new TriangleMesh(GraphicsDevice);
+            triangle = new StaticTriangleMesh(GraphicsDevice);
 
-            square = new SquareMesh(GraphicsDevice);
+            square = new StaticSquareMesh(GraphicsDevice);
             square.setColour(Color.Blue);
             square.updateMesh();
 
-            hexagon = new HexagonMesh(GraphicsDevice);
+            hexagon = new StaticHexagonMesh(GraphicsDevice);
             hexagon.setColour(Color.Purple);
             hexagon.Radius = 0.5f;
             hexagon.updateMesh();
+
+            cube = new StaticCubeMesh(GraphicsDevice);
 
             base.Initialize();
         }
@@ -95,7 +100,7 @@ namespace Cameras_and_Primitives
                 Exit();
 
             // TODO: Add your update logic here
-
+            rot += gameTime.ElapsedGameTime.Milliseconds / 10;
             base.Update(gameTime);
         }
 
@@ -127,22 +132,22 @@ namespace Cameras_and_Primitives
             //position and draw the hexagon
             pos.X = 3;
             basicEffect.World = Matrix.Identity;
-            basicEffect.World *= Matrix.CreateTranslation(pos);
-            hexagon.draw(basicEffect.CurrentTechnique.Passes);
+            basicEffect.World *= Matrix.CreateRotationX(MathHelper.ToRadians(rot)) * Matrix.CreateTranslation(pos);
+            cube.draw(basicEffect.CurrentTechnique.Passes);
 
             base.Draw(gameTime);
         }
 
         private void setupMesh()
         {
-            mesh = new PrimitiveMesh(GraphicsDevice);
+            mesh = new StaticPrimitiveMesh(GraphicsDevice);
 
             //create the vertices of the mesh primitive to hold position and colour data
-            VertexPositionColor[] vertices = new VertexPositionColor[3];
+            VertexData[] vertices = new VertexData[3];
             //vertex winding order is Clockwise
-            vertices[0] = new VertexPositionColor(new Vector3(-0.5f, 0, 0), Color.Red);
-            vertices[1] = new VertexPositionColor(new Vector3(0, 1, 0), Color.Green);
-            vertices[2] = new VertexPositionColor(new Vector3(0.5f, 0, 0), Color.Blue);
+            vertices[0] = new VertexData(new Vector3(-0.5f, 0, 0), Color.Red);
+            vertices[1] = new VertexData(new Vector3(0, 1, 0), Color.Green);
+            vertices[2] = new VertexData(new Vector3(0.5f, 0, 0), Color.Blue);
             mesh.Vertices = vertices;
 
             //create the indices of the vertices to make up the primitive
