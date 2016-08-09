@@ -10,7 +10,7 @@ namespace Cameras_and_Primitives
     {
         //The data each vertex carries
         public Vector3 position;
-        public Vector2 normal;
+        public Vector3 normal;
         public Vector2 uv;
         public Color colour;
 
@@ -18,8 +18,8 @@ namespace Cameras_and_Primitives
         public readonly static VertexDeclaration Decleration = new VertexDeclaration(
             new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
             new VertexElement(12, VertexElementFormat.Vector2, VertexElementUsage.Normal, 0),
-            new VertexElement(20, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
-            new VertexElement(28, VertexElementFormat.Color, VertexElementUsage.Color, 0)
+            new VertexElement(24, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
+            new VertexElement(32, VertexElementFormat.Color, VertexElementUsage.Color, 0)
         );
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace Cameras_and_Primitives
         public VertexData(Vector3 position)
         {
             this.position = position;
-            this.normal = Vector2.Zero;
+            this.normal = Vector3.Zero;
             this.uv = Vector2.Zero;
             this.colour = Color.White;
         }
@@ -39,7 +39,7 @@ namespace Cameras_and_Primitives
         /// </summary>
         /// <param name="position"></param>
         /// <param name="normal"></param>
-        public VertexData(Vector3 position, Vector2 normal)
+        public VertexData(Vector3 position, Vector3 normal)
         {
             this.position = position;
             this.normal = normal;
@@ -53,7 +53,7 @@ namespace Cameras_and_Primitives
         /// <param name="position"></param>
         /// <param name="normal"></param>
         /// <param name="uv"></param>
-        public VertexData(Vector3 position, Vector2 normal, Vector2 uv)
+        public VertexData(Vector3 position, Vector3 normal, Vector2 uv)
         {
             this.position = position;
             this.normal = normal;
@@ -68,7 +68,7 @@ namespace Cameras_and_Primitives
         /// <param name="normal"></param>
         /// <param name="uv"></param>
         /// <param name="colour"></param>
-        public VertexData(Vector3 position, Vector2 normal, Vector2 uv, Color colour)
+        public VertexData(Vector3 position, Vector3 normal, Vector2 uv, Color colour)
         {
             this.position = position;
             this.normal = normal;
@@ -84,7 +84,7 @@ namespace Cameras_and_Primitives
         public VertexData(Vector3 position, Color colour)
         {
             this.position = position;
-            this.normal = Vector2.Zero;
+            this.normal = Vector3.Zero;
             this.uv = Vector2.Zero;
             this.colour = colour;
         }
