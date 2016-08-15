@@ -4,10 +4,12 @@ namespace Cameras_and_Primitives
 {
     class Camera
     {
-        private Vector3 position;
+        private Vector3 position, up, forward, right;
+        private Quaternion rotation;
+        //world seems to be becoming redundant - might be needed when transform component is made.
         private Matrix world, view, projection;
         private float FOV, aspect, near, far;
-        
+
         /// <summary>
         /// Setup a camera to have 45 degree field of view in perspective with widescreen aspect ratio.
         /// Positioned at the centre of the world.
@@ -19,6 +21,10 @@ namespace Cameras_and_Primitives
             near = 0.1f;
             far = 1000f;
             position = Vector3.Zero;
+            up = Vector3.Up;
+            forward = Vector3.Forward;
+            right = Vector3.Right;
+            rotation = Quaternion.Identity;
             setupMatrices();
         }
 
@@ -34,6 +40,10 @@ namespace Cameras_and_Primitives
             near = 0.1f;
             far = 1000f;
             this.position = position;
+            up = Vector3.Up;
+            forward = Vector3.Forward;
+            right = Vector3.Right;
+            rotation = Quaternion.Identity;
             setupMatrices();
         }
 
@@ -58,8 +68,38 @@ namespace Cameras_and_Primitives
             set
             {
                 position = value;
-                view = Matrix.CreateLookAt(position, position + Vector3.Forward, Vector3.Up);
+                view = Matrix.CreateLookAt(position, position + forward, up);
             }
+        }
+
+        public Quaternion Rotation
+        {
+            get { return rotation; }
+            set
+            {
+                rotation = value;
+                //updates direction vectors of this camera
+                up = Vector3.Transform(Vector3.Up, rotation);
+                forward = Vector3.Transform(Vector3.Forward, rotation);
+                right = Vector3.Transform(Vector3.Right, rotation);
+                //updates the view of the camera now
+                view = Matrix.CreateLookAt(position, position + forward, up);
+            }
+        }
+
+        public Vector3 Forward
+        {
+            get { return forward; }
+        }
+
+        public Vector3 Up
+        {
+            get { return up; }
+        }
+
+        public Vector3 Right
+        {
+            get { return right; }
         }
 
         /// <summary>
@@ -95,6 +135,7 @@ namespace Cameras_and_Primitives
 
         /// <summary>
         /// Updates the camera's orientation to be looking at the supplied position.
+        /// INCOMPLETE -- Needs to be able to update rotation, and direction vectors
         /// </summary>
         /// <param name="target"></param>
         public void lookAt(Vector3 target)
