@@ -11,21 +11,39 @@ namespace FPS_Movement
     /// </summary>
     public class Game1 : Game
     {
+        #region Window Properties and Utilities
+        int screenWidth = 1280, screenHeight = 720;
+        string windowTitle = "First Person Camera";
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Model skybox;
         Time timer;
-        //camera settings
+        KeyboardState prevState;
+        Vector2 oldMousePos = Vector2.Zero;
+        #endregion
+        #region Meshes
+        Model skybox;
+        Matrix skyboxWorld;
+        Vector3 skyboxOffset;
+        GameObjects.Plane plane;
+        #endregion
+        #region Camera Settings
         Camera camera;
         Vector3 camPos, camRot;
+        //movement values
         float moveSpeed = 20f, lookSensitivity = 10;
-        GameObjects.Plane plane;
-        Vector2 oldMousePos = Vector2.Zero;
+        //jumping variables
+        float groundHeight = 3, jumpVelocity = 0, jumpForce = 10;
+        #endregion
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            //configure the game window
+            this.Window.Title = windowTitle;
+            graphics.PreferredBackBufferWidth = screenWidth;
+            graphics.PreferredBackBufferHeight = screenHeight;
+            graphics.ApplyChanges();
         }
 
         /// <summary>
@@ -37,15 +55,17 @@ namespace FPS_Movement
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            camera = new Camera(new Vector3(0, 2, 10));
+            camera = new Camera(new Vector3(0, groundHeight, 10));
             camPos = camera.Position;
             camRot = Vector3.Zero;
             plane = new GameObjects.Plane(this);
             plane.position.X = 0;
             plane.position.Y = 0;
-            plane.scale = new Vector3(200, 200, 1);
+            plane.scale = new Vector3(500, 500, 1);
             plane.rotation = Quaternion.CreateFromAxisAngle(Vector3.Left, MathHelper.ToRadians(90));
             timer = Time.Instance;
+            oldMousePos = Mouse.GetState().Position.ToVector2();
+            skyboxOffset = Vector3.Down / 8f;
             base.Initialize();
         }
 
@@ -81,10 +101,15 @@ namespace FPS_Movement
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
             timer.tick(ref gameTime);
             // TODO: Add your update logic here
             moveCamera();
             rotateCamera();
+            camera.update();
+            applyGravity();
+            //store the keyboard state to check for single press instead of held down press
+            prevState = Keyboard.GetState();
             base.Update(gameTime);
         }
 
@@ -103,11 +128,14 @@ namespace FPS_Movement
             base.Draw(gameTime);
         }
 
+        #region Camera Movement
+
         private void moveCamera()
         {
             KeyboardState keyState = Keyboard.GetState();
             Vector3 normalisedMovement = Vector3.Zero;
 
+            checkJumpKey();
             if(keyState.IsKeyDown(Keys.W))
             {
                 //camPos.Z -= moveSpeed * timer.DeltaTime;
@@ -140,8 +168,29 @@ namespace FPS_Movement
                 normalisedMovement.Normalize();
                 //apply the movement
                 camPos += normalisedMovement * moveSpeed * timer.DeltaTime;
+                //now apply any jumping velocity if there is any
+                camPos.Y += jumpVelocity * timer.DeltaTime;
+                //correct our position if we've fallen below the ground
+                if(camPos.Y < groundHeight)
+                    camPos.Y = groundHeight;
                 //update camera's position
                 camera.Position = camPos;
+            }
+            else if(jumpVelocity != 0) //if we stand still and jump
+            {
+                camPos.Y += jumpVelocity * timer.DeltaTime;
+                if (camPos.Y < groundHeight)
+                    camPos.Y = groundHeight;
+                //update camera's position
+                camera.Position = camPos;
+            }
+        }
+
+        private void checkJumpKey()
+        {
+            if(Keyboard.GetState().IsKeyDown(Keys.Space) && prevState.IsKeyUp(Keys.Space))
+            {
+                jumpVelocity = jumpForce;
             }
         }
 
@@ -165,20 +214,31 @@ namespace FPS_Movement
             oldMousePos = Mouse.GetState().Position.ToVector2();
         }
 
+        private void applyGravity()
+        {
+            if(camPos.Y > groundHeight)
+                jumpVelocity -= timer.DeltaTime * 10;
+            else
+                jumpVelocity = 0;
+        }
+        
+        #endregion
+
         private void drawSkybox()
         {
-            Matrix world = camera.World * Matrix.CreateTranslation(camera.Position);
+            skyboxWorld = camera.World * Matrix.CreateTranslation(camera.Position + skyboxOffset);
+            //change how the texture is drawn on the model to remove visible seems
             SamplerState sampler = new SamplerState();
             sampler.AddressU = TextureAddressMode.Clamp;
             sampler.AddressV = TextureAddressMode.Clamp;
             GraphicsDevice.SamplerStates[0] = sampler;
-
+            //Disable depth buffering
             DepthStencilState depthStencil = new DepthStencilState();
             depthStencil.DepthBufferEnable = false;
             GraphicsDevice.DepthStencilState = depthStencil;
-
-            skybox.Draw(world, camera.View, camera.Projection);
-
+            
+            skybox.Draw(skyboxWorld, camera.View, camera.Projection);
+            //re-enable depth buffering
             depthStencil = new DepthStencilState();
             depthStencil.DepthBufferEnable = false;
             GraphicsDevice.DepthStencilState = depthStencil;

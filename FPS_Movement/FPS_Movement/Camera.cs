@@ -9,6 +9,7 @@ namespace Cameras_and_Primitives
         //world seems to be becoming redundant - might be needed when transform component is made.
         private Matrix world, view, projection;
         private float FOV, aspect, near, far;
+        private bool viewNeedsUpdate = false;
 
         /// <summary>
         /// Setup a camera to have 45 degree field of view in perspective with widescreen aspect ratio.
@@ -68,7 +69,8 @@ namespace Cameras_and_Primitives
             set
             {
                 position = value;
-                view = Matrix.CreateLookAt(position, position + forward, up);
+                viewNeedsUpdate = true;
+                //view = Matrix.CreateLookAt(position, position + forward, up);
             }
         }
 
@@ -82,8 +84,9 @@ namespace Cameras_and_Primitives
                 up = Vector3.Transform(Vector3.Up, rotation);
                 forward = Vector3.Transform(Vector3.Forward, rotation);
                 right = Vector3.Transform(Vector3.Right, rotation);
-                //updates the view of the camera now
-                view = Matrix.CreateLookAt(position, position + forward, up);
+                viewNeedsUpdate = true;
+                ////updates the view of the camera now
+                //view = Matrix.CreateLookAt(position, position + forward, up);
             }
         }
 
@@ -149,6 +152,19 @@ namespace Cameras_and_Primitives
         public void updateProjection()
         {
             projection = Matrix.CreatePerspectiveFieldOfView(FOV, aspect, near, far);
+        }
+
+        /// <summary>
+        /// Will perform any updates that have been queried or required by the camera due to a change in view or position
+        /// </summary>
+        public void update()
+        {
+            if(viewNeedsUpdate)
+            {
+                //updates the view of the camera now
+                view = Matrix.CreateLookAt(position, position + forward, up);
+                viewNeedsUpdate = false;
+            }
         }
 
         public void setAspectRatio(float width, float height)
