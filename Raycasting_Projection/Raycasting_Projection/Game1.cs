@@ -34,6 +34,8 @@ namespace Raycasting_Projection
         //jumping variables
         float groundHeight = 3, jumpVelocity = 0, jumpForce = 10;
         #endregion
+        BoundingBox planeCollider;
+        TexturedCube debugCube;
 
         public Game1()
         {
@@ -41,6 +43,7 @@ namespace Raycasting_Projection
             Content.RootDirectory = "Content";
             //configure the game window
             this.Window.Title = windowTitle;
+            this.IsMouseVisible = true;
             graphics.PreferredBackBufferWidth = screenWidth;
             graphics.PreferredBackBufferHeight = screenHeight;
             graphics.ApplyChanges();
@@ -66,6 +69,11 @@ namespace Raycasting_Projection
             timer = Time.Instance;
             oldMousePos = Mouse.GetState().Position.ToVector2();
             skyboxOffset = Vector3.Down / 8f;
+
+            Vector3 planeMinPoint, planeMaxPoint;
+            planeMinPoint = plane.position - new Vector3(plane.scale.X/2, 0, plane.scale.Y/2);
+            planeMaxPoint = plane.position + new Vector3(plane.scale.X / 2, 0, plane.scale.Y / 2);
+            planeCollider = new BoundingBox(planeMinPoint, planeMaxPoint);
             base.Initialize();
         }
 
@@ -108,6 +116,8 @@ namespace Raycasting_Projection
             rotateCamera();
             camera.update();
             applyGravity();
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+                rayCast();
             //store the keyboard state to check for single press instead of held down press
             prevState = Keyboard.GetState();
             base.Update(gameTime);
@@ -223,6 +233,30 @@ namespace Raycasting_Projection
         }
 
         #endregion
+
+        private void rayCast()
+        {
+            Vector3 mousePosNear = new Vector3(Mouse.GetState().Position.ToVector2(), 0);
+            Vector3 mousePosFar = mousePosNear;
+            mousePosFar.Z = 1;
+
+            //figure out where the mouse has clicked relative to the near and far plane
+            Vector3 pointA, pointB, dir;
+            pointA = GraphicsDevice.Viewport.Unproject(mousePosNear, camera.Projection, camera.View, camera.World);
+            pointB = GraphicsDevice.Viewport.Unproject(mousePosFar, camera.Projection, camera.View, camera.World);
+
+            //create the direction the ray needs to travel
+            dir = pointB - pointA;
+            dir.Normalize();
+
+            Ray ray = new Ray(pointA, dir);
+            float? distance = ray.Intersects(planeCollider);
+            
+            if(distance != null)
+                System.Console.WriteLine("Ray intersection at: " + distance);
+            else
+                System.Console.WriteLine("No intersection found.");
+        }
 
         private void drawSkybox()
         {
