@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Cameras_and_Primitives;
 using MovingTextDemo;
+using Raycasting_Projection.Utilities;
 
 namespace Raycasting_Projection
 {
@@ -36,6 +37,10 @@ namespace Raycasting_Projection
         #endregion
         BoundingBox planeCollider;
         TexturedCube debugCube;
+        BasicEffect cubeEffect;
+        Vector3 cubePos;
+        Matrix cubeWorld;
+        Raycast raycaster;
 
         public Game1()
         {
@@ -74,6 +79,14 @@ namespace Raycasting_Projection
             planeMinPoint = plane.position - new Vector3(plane.scale.X/2, 0, plane.scale.Y/2);
             planeMaxPoint = plane.position + new Vector3(plane.scale.X / 2, 0, plane.scale.Y / 2);
             planeCollider = new BoundingBox(planeMinPoint, planeMaxPoint);
+
+            raycaster = new Raycast(GraphicsDevice);
+
+            debugCube = new TexturedCube();
+            debugCube.initialise(GraphicsDevice, null);
+            cubeEffect = new BasicEffect(GraphicsDevice);
+            cubeEffect.VertexColorEnabled = true;
+
             base.Initialize();
         }
 
@@ -116,8 +129,19 @@ namespace Raycasting_Projection
             rotateCamera();
             camera.update();
             applyGravity();
+
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
-                rayCast();
+            {
+                raycaster.setupMatrices(camera.World, camera.View, camera.Projection);
+                RaycastResult info;
+                if(raycaster.cast(Mouse.GetState().Position.ToVector2(), planeCollider, out info))
+                {
+                    System.Console.WriteLine("Distance to point: " + info.distance);
+                    System.Console.WriteLine("Contact point: " + info.contactPoint);
+                    cubeWorld = Matrix.CreateTranslation(info.contactPoint);
+                }
+            }
+                
             //store the keyboard state to check for single press instead of held down press
             prevState = Keyboard.GetState();
             base.Update(gameTime);
@@ -135,6 +159,15 @@ namespace Raycasting_Projection
             drawSkybox();
             plane.draw(camera.View, camera.Projection);
 
+            cubeEffect.World = cubeWorld;
+            cubeEffect.View = camera.View;
+            cubeEffect.Projection = camera.Projection;
+            foreach(EffectPass pass in cubeEffect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                debugCube.draw();
+            }
+            debugCube.draw();
             base.Draw(gameTime);
         }
 
@@ -233,30 +266,6 @@ namespace Raycasting_Projection
         }
 
         #endregion
-
-        private void rayCast()
-        {
-            Vector3 mousePosNear = new Vector3(Mouse.GetState().Position.ToVector2(), 0);
-            Vector3 mousePosFar = mousePosNear;
-            mousePosFar.Z = 1;
-
-            //figure out where the mouse has clicked relative to the near and far plane
-            Vector3 pointA, pointB, dir;
-            pointA = GraphicsDevice.Viewport.Unproject(mousePosNear, camera.Projection, camera.View, camera.World);
-            pointB = GraphicsDevice.Viewport.Unproject(mousePosFar, camera.Projection, camera.View, camera.World);
-
-            //create the direction the ray needs to travel
-            dir = pointB - pointA;
-            dir.Normalize();
-
-            Ray ray = new Ray(pointA, dir);
-            float? distance = ray.Intersects(planeCollider);
-            
-            if(distance != null)
-                System.Console.WriteLine("Ray intersection at: " + distance);
-            else
-                System.Console.WriteLine("No intersection found.");
-        }
 
         private void drawSkybox()
         {
