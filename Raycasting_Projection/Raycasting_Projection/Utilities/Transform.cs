@@ -4,7 +4,7 @@ namespace Raycasting_Projection.Utilities
 {
     class Transform
     {
-        private Vector3 position, up, forward, right;
+        private Vector3 position, up, forward, right, scale;
         private Quaternion rotation;
 
         public Transform()
@@ -13,6 +13,7 @@ namespace Raycasting_Projection.Utilities
             up = Vector3.Up;
             forward = Vector3.Forward;
             right = Vector3.Right;
+            scale = Vector3.One;
             rotation = Quaternion.Identity;
         }
 
@@ -20,6 +21,12 @@ namespace Raycasting_Projection.Utilities
         {
             get { return position; }
             set { position = value; }
+        }
+
+        public Vector3 Scale
+        {
+            get { return scale; }
+            set { scale = value; }
         }
 
         public Quaternion Rotation

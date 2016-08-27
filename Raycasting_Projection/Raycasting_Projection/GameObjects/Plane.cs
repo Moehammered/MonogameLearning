@@ -29,7 +29,7 @@ namespace FPS_Movement.GameObjects
             scale = Vector3.One;
             rotation = Quaternion.Identity;
             world = Matrix.Identity;
-
+            
             constructMesh();
         }
         

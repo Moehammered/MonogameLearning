@@ -4,6 +4,8 @@ using Microsoft.Xna.Framework.Input;
 using Cameras_and_Primitives;
 using MovingTextDemo;
 using Raycasting_Projection.Utilities;
+using Raycasting_Projection.GameObjects;
+using Raycasting_Projection.Components;
 
 namespace Raycasting_Projection
 {
@@ -41,6 +43,7 @@ namespace Raycasting_Projection
         Vector3 cubePos;
         Matrix cubeWorld;
         Raycast raycaster;
+        GameObject cubeTest;
 
         public Game1()
         {
@@ -86,6 +89,15 @@ namespace Raycasting_Projection
             debugCube.initialise(GraphicsDevice, null);
             cubeEffect = new BasicEffect(GraphicsDevice);
             cubeEffect.VertexColorEnabled = true;
+
+            cubeTest = new GameObject(this);
+            MeshRendererComponent rend = cubeTest.AddComponent<MeshRendererComponent>();
+            rend.owner = cubeTest;
+            StaticMesh mesh = new StaticMesh();
+            mesh.useTriangleList();
+            mesh.Vertices = debugCube.mesh.Vertices;
+            mesh.Indices = debugCube.mesh.Indices;
+            rend.Mesh = mesh;
 
             base.Initialize();
         }
@@ -153,6 +165,7 @@ namespace Raycasting_Projection
                     System.Console.WriteLine("Contact point: " + info.contactPoint);
                     cubePos = info.contactPoint; //THIS IS WHY LOOKAT WASNT WORKING!!!
                     cubeWorld = Matrix.CreateTranslation(cubePos);
+                    cubeTest.transform.Position = cubePos;
                 }
             }
             if(Keyboard.GetState().IsKeyDown(Keys.R) && prevState.IsKeyUp(Keys.R))
@@ -177,7 +190,7 @@ namespace Raycasting_Projection
             drawSkybox();
             plane.draw(camera.View, camera.Projection);
 
-            cubeEffect.World = cubeWorld * camera.World;
+            /*cubeEffect.World = cubeWorld * camera.World;
             cubeEffect.View = camera.View;
             cubeEffect.Projection = camera.Projection;
             foreach(EffectPass pass in cubeEffect.CurrentTechnique.Passes)
@@ -185,7 +198,7 @@ namespace Raycasting_Projection
                 pass.Apply();
                 debugCube.draw();
             }
-            debugCube.draw();
+            debugCube.draw();*/
             base.Draw(gameTime);
         }
 

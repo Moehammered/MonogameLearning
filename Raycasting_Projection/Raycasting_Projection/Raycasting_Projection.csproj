@@ -41,6 +41,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Components\StaticMesh.cs" />
+    <Compile Include="Components\MeshRendererComponent.cs" />
+    <Compile Include="GameObjects\GameObject.cs" />
     <Compile Include="Utilities\Camera.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="GameObjects\Plane.cs" />

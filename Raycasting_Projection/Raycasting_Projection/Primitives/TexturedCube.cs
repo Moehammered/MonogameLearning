@@ -7,7 +7,7 @@ namespace Cameras_and_Primitives
     class TexturedCube
     {
         private float width, height, depth;
-        private StaticPrimitiveMesh mesh;
+        public StaticPrimitiveMesh mesh;
         //Not used yet
         private Texture2D texture;
 

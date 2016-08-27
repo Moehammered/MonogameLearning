@@ -11,6 +11,8 @@ namespace Cameras_and_Primitives
         private float FOV, aspect, near, far;
         private bool viewNeedsUpdate = false;
 
+        public static Camera mainCamera;
+
         /// <summary>
         /// Setup a camera to have 45 degree field of view in perspective with widescreen aspect ratio.
         /// Positioned at the centre of the world.
@@ -22,7 +24,10 @@ namespace Cameras_and_Primitives
             near = 0.1f;
             far = 1000f;
             transform = new Transform();
-            
+
+            if (mainCamera == null)
+                mainCamera = this;
+
             setupMatrices();
         }
 
@@ -39,6 +44,9 @@ namespace Cameras_and_Primitives
             far = 1000f;
             transform = new Transform();
             transform.Position = position;
+
+            if (mainCamera == null)
+                mainCamera = this;
 
             setupMatrices();
         }
