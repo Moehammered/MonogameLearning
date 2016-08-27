@@ -48,6 +48,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Primitives\StaticPrimitiveMesh.cs" />
     <Compile Include="Primitives\TexturedCube.cs" />
+    <Compile Include="Utilities\ExtensionUtilities.cs" />
     <Compile Include="Utilities\Raycast.cs" />
     <Compile Include="Utilities\Time.cs" />
     <Compile Include="Primitives\VertexData.cs" />

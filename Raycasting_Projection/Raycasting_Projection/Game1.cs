@@ -127,6 +127,19 @@ namespace Raycasting_Projection
             // TODO: Add your update logic here
             moveCamera();
             rotateCamera();
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Z))
+            {
+                Vector3 look = cubePos;
+                look.Y = camPos.Y;
+                camera.lookAt(cubePos);
+                if (Keyboard.GetState().IsKeyDown(Keys.V) && prevState.IsKeyUp(Keys.V))
+                {
+                    System.Console.WriteLine("Cam forward (from quat): " + camera.Forward);
+                    System.Console.WriteLine("Cam forward (from end - start): " + Vector3.Normalize(look - camera.Position));
+                }
+                camRot = camera.Rotation.toEuler();
+            }
             camera.update();
             applyGravity();
 
@@ -138,10 +151,15 @@ namespace Raycasting_Projection
                 {
                     System.Console.WriteLine("Distance to point: " + info.distance);
                     System.Console.WriteLine("Contact point: " + info.contactPoint);
-                    cubeWorld = Matrix.CreateTranslation(info.contactPoint);
+                    cubePos = info.contactPoint; //THIS IS WHY LOOKAT WASNT WORKING!!!
+                    cubeWorld = Matrix.CreateTranslation(cubePos);
                 }
             }
-                
+            if(Keyboard.GetState().IsKeyDown(Keys.R) && prevState.IsKeyUp(Keys.R))
+            {
+                System.Console.WriteLine("CamRot: " + camRot);
+                System.Console.WriteLine("Euler from Quat: " + camera.Rotation.toEuler());
+            }
             //store the keyboard state to check for single press instead of held down press
             prevState = Keyboard.GetState();
             base.Update(gameTime);

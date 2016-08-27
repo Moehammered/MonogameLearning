@@ -134,7 +134,10 @@ namespace Cameras_and_Primitives
         /// <param name="target"></param>
         public void lookAt(Vector3 target)
         {
-            view = Matrix.CreateLookAt(transform.Position, target, transform.Up);
+            Vector3 newDir = target - Position;
+            newDir.Normalize();
+            Rotation = Rotation.LookRotation(Vector3.Forward, newDir, Vector3.Up);
+            //view = Matrix.CreateLookAt(transform.Position, transform.Position + transform.Forward, transform.Up);
         }
 
         /// <summary>
