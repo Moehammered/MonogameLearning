@@ -1,11 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
+using Raycasting_Projection.Utilities;
 
 namespace Cameras_and_Primitives
 {
     class Camera
     {
-        private Vector3 position, up, forward, right;
-        private Quaternion rotation;
+        private Transform transform;
         //world seems to be becoming redundant - might be needed when transform component is made.
         private Matrix world, view, projection;
         private float FOV, aspect, near, far;
@@ -21,11 +21,8 @@ namespace Cameras_and_Primitives
             aspect = 1920f / 1080f; //widescreen aspect ratio
             near = 0.1f;
             far = 1000f;
-            position = Vector3.Zero;
-            up = Vector3.Up;
-            forward = Vector3.Forward;
-            right = Vector3.Right;
-            rotation = Quaternion.Identity;
+            transform = new Transform();
+            
             setupMatrices();
         }
 
@@ -40,11 +37,9 @@ namespace Cameras_and_Primitives
             aspect = 1920f / 1080f; //widescreen aspect ratio
             near = 0.1f;
             far = 1000f;
-            this.position = position;
-            up = Vector3.Up;
-            forward = Vector3.Forward;
-            right = Vector3.Right;
-            rotation = Quaternion.Identity;
+            transform = new Transform();
+            transform.Position = position;
+
             setupMatrices();
         }
 
@@ -65,10 +60,10 @@ namespace Cameras_and_Primitives
 
         public Vector3 Position
         {
-            get { return position; }
+            get { return transform.Position; }
             set
             {
-                position = value;
+                transform.Position = value;
                 viewNeedsUpdate = true;
                 //view = Matrix.CreateLookAt(position, position + forward, up);
             }
@@ -76,14 +71,10 @@ namespace Cameras_and_Primitives
 
         public Quaternion Rotation
         {
-            get { return rotation; }
+            get { return transform.Rotation; }
             set
             {
-                rotation = value;
-                //updates direction vectors of this camera
-                up = Vector3.Transform(Vector3.Up, rotation);
-                forward = Vector3.Transform(Vector3.Forward, rotation);
-                right = Vector3.Transform(Vector3.Right, rotation);
+                transform.Rotation = value;
                 viewNeedsUpdate = true;
                 ////updates the view of the camera now
                 //view = Matrix.CreateLookAt(position, position + forward, up);
@@ -92,17 +83,17 @@ namespace Cameras_and_Primitives
 
         public Vector3 Forward
         {
-            get { return forward; }
+            get { return transform.Forward; }
         }
 
         public Vector3 Up
         {
-            get { return up; }
+            get { return transform.Up; }
         }
 
         public Vector3 Right
         {
-            get { return right; }
+            get { return transform.Right; }
         }
 
         /// <summary>
@@ -132,7 +123,7 @@ namespace Cameras_and_Primitives
         private void setupMatrices()
         {
             world = Matrix.CreateTranslation(Vector3.Zero);
-            view = Matrix.CreateLookAt(position, position + Vector3.Forward, Vector3.Up);
+            view = Matrix.CreateLookAt(transform.Position, transform.Position + transform.Forward, transform.Up);
             projection = Matrix.CreatePerspectiveFieldOfView(FOV, aspect, near, far);
         }
 
@@ -143,7 +134,7 @@ namespace Cameras_and_Primitives
         /// <param name="target"></param>
         public void lookAt(Vector3 target)
         {
-            view = Matrix.CreateLookAt(position, target, Vector3.Up);
+            view = Matrix.CreateLookAt(transform.Position, target, transform.Up);
         }
 
         /// <summary>
@@ -162,7 +153,7 @@ namespace Cameras_and_Primitives
             if(viewNeedsUpdate)
             {
                 //updates the view of the camera now
-                view = Matrix.CreateLookAt(position, position + forward, up);
+                view = Matrix.CreateLookAt(transform.Position, transform.Position + transform.Forward, transform.Up);
                 viewNeedsUpdate = false;
             }
         }

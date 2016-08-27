@@ -51,6 +51,7 @@
     <Compile Include="Utilities\Raycast.cs" />
     <Compile Include="Utilities\Time.cs" />
     <Compile Include="Primitives\VertexData.cs" />
+    <Compile Include="Utilities\Transform.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

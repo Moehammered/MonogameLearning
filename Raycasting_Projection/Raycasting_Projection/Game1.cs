@@ -159,7 +159,7 @@ namespace Raycasting_Projection
             drawSkybox();
             plane.draw(camera.View, camera.Projection);
 
-            cubeEffect.World = cubeWorld;
+            cubeEffect.World = cubeWorld * camera.World;
             cubeEffect.View = camera.View;
             cubeEffect.Projection = camera.Projection;
             foreach(EffectPass pass in cubeEffect.CurrentTechnique.Passes)
@@ -269,7 +269,7 @@ namespace Raycasting_Projection
 
         private void drawSkybox()
         {
-            skyboxWorld = camera.World * Matrix.CreateTranslation(camera.Position + skyboxOffset);
+            skyboxWorld = Matrix.CreateTranslation(camera.Position + skyboxOffset);
             //change how the texture is drawn on the model to remove visible seems
             SamplerState sampler = new SamplerState();
             sampler.AddressU = TextureAddressMode.Clamp;
