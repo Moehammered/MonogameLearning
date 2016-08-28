@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Cameras_and_Primitives;
@@ -27,23 +28,19 @@ namespace Raycasting_Projection
         Model skybox;
         Matrix skyboxWorld;
         Vector3 skyboxOffset;
-        FPS_Movement.GameObjects.Plane plane;
         #endregion
         #region Camera Settings
-        Camera camera;
         Vector3 camPos, camRot;
-        //movement values
         float moveSpeed = 20f, lookSensitivity = 10;
-        //jumping variables
         float groundHeight = 3, jumpVelocity = 0, jumpForce = 10;
         #endregion
+        #region GameObjects
+        GameObject camera;
+        GameObject plane;
         BoundingBox planeCollider;
-        TexturedCube debugCube;
-        BasicEffect cubeEffect;
-        Vector3 cubePos;
-        Matrix cubeWorld;
-        Raycast raycaster;
-        GameObject cubeTest;
+        GameObject tank;
+        #endregion
+
 
         public Game1()
         {
@@ -66,38 +63,41 @@ namespace Raycasting_Projection
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            camera = new Camera(new Vector3(0, groundHeight, 10));
-            camPos = camera.Position;
+            //create the camera gameObject
+            camera = new GameObject(this);
+            camera.transform.Position = new Vector3(0, groundHeight, 10);
+            camera.AddComponent<Camera>();
+            camPos = camera.transform.Position;
             camRot = Vector3.Zero;
-            plane = new FPS_Movement.GameObjects.Plane(this);
-            plane.position.X = 0;
-            plane.position.Y = 0;
-            plane.scale = new Vector3(500, 500, 1);
-            plane.rotation = Quaternion.CreateFromAxisAngle(Vector3.Left, MathHelper.ToRadians(90));
+
+            //create the ground plane gameObject
+            plane = new GameObject(this);
+            plane.transform.Position = Vector3.Zero;
+            plane.transform.Scale = new Vector3(500, 500, 1);
+            plane.transform.Rotation = Quaternion.CreateFromAxisAngle(Vector3.Left, MathHelper.ToRadians(90));
+            MeshRendererComponent planeRend = plane.AddComponent<MeshRendererComponent>();
+            planeRend.Mesh = PrimitiveShape.CreateXYPlane();
+            //create the plane's bounding box
+            Vector3 planeMinPoint, planeMaxPoint;
+            planeMinPoint = plane.transform.Position - new Vector3(plane.transform.Scale.X / 2, 0, plane.transform.Scale.Y / 2);
+            planeMaxPoint = plane.transform.Position + new Vector3(plane.transform.Scale.X / 2, 0, plane.transform.Scale.Y / 2);
+            planeCollider = new BoundingBox(planeMinPoint, planeMaxPoint);
+
+            //setup the game utlities
             timer = Time.Instance;
             oldMousePos = Mouse.GetState().Position.ToVector2();
             skyboxOffset = Vector3.Down / 8f;
 
-            Vector3 planeMinPoint, planeMaxPoint;
-            planeMinPoint = plane.position - new Vector3(plane.scale.X/2, 0, plane.scale.Y/2);
-            planeMaxPoint = plane.position + new Vector3(plane.scale.X / 2, 0, plane.scale.Y / 2);
-            planeCollider = new BoundingBox(planeMinPoint, planeMaxPoint);
-
-            raycaster = new Raycast(GraphicsDevice);
-
-            debugCube = new TexturedCube();
-            debugCube.initialise(GraphicsDevice, null);
-            cubeEffect = new BasicEffect(GraphicsDevice);
-            cubeEffect.VertexColorEnabled = true;
-
-            cubeTest = new GameObject(this);
-            MeshRendererComponent rend = cubeTest.AddComponent<MeshRendererComponent>();
-            rend.owner = cubeTest;
-            StaticMesh mesh = new StaticMesh();
-            mesh.useTriangleList();
-            mesh.Vertices = debugCube.mesh.Vertices;
-            mesh.Indices = debugCube.mesh.Indices;
-            rend.Mesh = mesh;
+            //Create the tank gameObject
+            tank = new GameObject(this);
+            tank.transform.Position = new Vector3(0, 0, 1);
+            tank.transform.Scale = new Vector3(0.01f, 0.01f, 0.01f);
+            tank.AddComponent<AnimatedTank>();
+            MoveToComponent tankMove = tank.AddComponent<MoveToComponent>();
+            tankMove.MinimumDistance = 1;
+            tankMove.speed = 2;
+            AnimatedTankMover tankMover = tank.AddComponent<AnimatedTankMover>();
+            tankMover.pickingVolume = planeCollider;
 
             base.Initialize();
         }
@@ -110,7 +110,9 @@ namespace Raycasting_Projection
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            plane.Texture = Content.Load<Texture2D>("Ground Model/3SNe");
+            MeshRendererComponent planeRend = plane.GetComponent<MeshRendererComponent>();
+            planeRend.Material.Texture = Content.Load<Texture2D>("Ground Model/3SNe");
+            planeRend.Material.TextureEnabled = true;
             skybox = Content.Load<Model>("Skybox Model/skybox");
 
             // TODO: use this.Content to load your game content here
@@ -140,39 +142,7 @@ namespace Raycasting_Projection
             moveCamera();
             rotateCamera();
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Z))
-            {
-                Vector3 look = cubePos;
-                look.Y = camPos.Y;
-                camera.lookAt(cubePos);
-                if (Keyboard.GetState().IsKeyDown(Keys.V) && prevState.IsKeyUp(Keys.V))
-                {
-                    System.Console.WriteLine("Cam forward (from quat): " + camera.Forward);
-                    System.Console.WriteLine("Cam forward (from end - start): " + Vector3.Normalize(look - camera.Position));
-                }
-                camRot = camera.Rotation.toEuler();
-            }
-            camera.update();
             applyGravity();
-
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
-            {
-                raycaster.setupMatrices(camera.World, camera.View, camera.Projection);
-                RaycastResult info;
-                if(raycaster.cast(Mouse.GetState().Position.ToVector2(), planeCollider, out info))
-                {
-                    System.Console.WriteLine("Distance to point: " + info.distance);
-                    System.Console.WriteLine("Contact point: " + info.contactPoint);
-                    cubePos = info.contactPoint; //THIS IS WHY LOOKAT WASNT WORKING!!!
-                    cubeWorld = Matrix.CreateTranslation(cubePos);
-                    cubeTest.transform.Position = cubePos;
-                }
-            }
-            if(Keyboard.GetState().IsKeyDown(Keys.R) && prevState.IsKeyUp(Keys.R))
-            {
-                System.Console.WriteLine("CamRot: " + camRot);
-                System.Console.WriteLine("Euler from Quat: " + camera.Rotation.toEuler());
-            }
             //store the keyboard state to check for single press instead of held down press
             prevState = Keyboard.GetState();
             base.Update(gameTime);
@@ -188,17 +158,7 @@ namespace Raycasting_Projection
 
             // TODO: Add your drawing code here
             drawSkybox();
-            plane.draw(camera.View, camera.Projection);
 
-            /*cubeEffect.World = cubeWorld * camera.World;
-            cubeEffect.View = camera.View;
-            cubeEffect.Projection = camera.Projection;
-            foreach(EffectPass pass in cubeEffect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-                debugCube.draw();
-            }
-            debugCube.draw();*/
             base.Draw(gameTime);
         }
 
@@ -214,25 +174,25 @@ namespace Raycasting_Projection
             {
                 //camPos.Z -= moveSpeed * timer.DeltaTime;
                 //camera.Position = camPos;
-                normalisedMovement += camera.Forward;
+                normalisedMovement += camera.transform.Forward;
             }
             else if (keyState.IsKeyDown(Keys.S))
             {
                 //camPos.Z += moveSpeed * timer.DeltaTime;
                 //camera.Position = camPos;
-                normalisedMovement -= camera.Forward;
+                normalisedMovement -= camera.transform.Forward;
             }
             if (keyState.IsKeyDown(Keys.A))
             {
                 //camPos.X -= moveSpeed * timer.DeltaTime;
                 //camera.Position = camPos;
-                normalisedMovement -= camera.Right;
+                normalisedMovement -= camera.transform.Right;
             }
             else if (keyState.IsKeyDown(Keys.D))
             {
                 //camPos.X += moveSpeed * timer.DeltaTime;
                 //camera.Position = camPos;
-                normalisedMovement += camera.Right;
+                normalisedMovement += camera.transform.Right;
             }
             //if movement has occured at all
             if (normalisedMovement.LengthSquared() > 0)
@@ -248,7 +208,7 @@ namespace Raycasting_Projection
                 if (camPos.Y < groundHeight)
                     camPos.Y = groundHeight;
                 //update camera's position
-                camera.Position = camPos;
+                camera.transform.Position = camPos;
             }
             else if (jumpVelocity != 0) //if we stand still and jump
             {
@@ -256,7 +216,7 @@ namespace Raycasting_Projection
                 if (camPos.Y < groundHeight)
                     camPos.Y = groundHeight;
                 //update camera's position
-                camera.Position = camPos;
+                camera.transform.Position = camPos;
             }
         }
 
@@ -283,7 +243,7 @@ namespace Raycasting_Projection
                 float pitch = MathHelper.ToRadians(camRot.X);
                 //this method requires the camRot to be normalised into radians
                 //camera.Rotation = Quaternion.CreateFromAxisAngle(camRot, 1f);
-                camera.Rotation = Quaternion.CreateFromYawPitchRoll(yaw, pitch, 0);
+                camera.transform.Rotation = Quaternion.CreateFromYawPitchRoll(yaw, pitch, 0);
             }
             oldMousePos = Mouse.GetState().Position.ToVector2();
         }
@@ -300,7 +260,7 @@ namespace Raycasting_Projection
 
         private void drawSkybox()
         {
-            skyboxWorld = Matrix.CreateTranslation(camera.Position + skyboxOffset);
+            skyboxWorld = Matrix.CreateTranslation(camera.transform.Position + skyboxOffset);
             //change how the texture is drawn on the model to remove visible seems
             SamplerState sampler = new SamplerState();
             sampler.AddressU = TextureAddressMode.Clamp;
@@ -311,10 +271,10 @@ namespace Raycasting_Projection
             depthStencil.DepthBufferEnable = false;
             GraphicsDevice.DepthStencilState = depthStencil;
 
-            skybox.Draw(skyboxWorld, camera.View, camera.Projection);
+            skybox.Draw(skyboxWorld, Camera.mainCamera.View, Camera.mainCamera.Projection);
             //re-enable depth buffering
             depthStencil = new DepthStencilState();
-            depthStencil.DepthBufferEnable = false;
+            depthStencil.DepthBufferEnable = true;
             GraphicsDevice.DepthStencilState = depthStencil;
         }
     }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using Raycasting_Projection.Components;
 using Raycasting_Projection.Utilities;
-using System;
 using System.Collections.Generic;
 
 namespace Raycasting_Projection.GameObjects
@@ -8,19 +8,23 @@ namespace Raycasting_Projection.GameObjects
     class GameObject
     {
         public Transform transform;
-        private List<GameComponent> components;
+        private List<Component> components;
         private Game gameInstance;
 
         public GameObject(Game game)
         {
             transform = new Transform();
-            components = new List<GameComponent>();
+            components = new List<Component>();
             gameInstance = game;
         }
 
-        public T AddComponent<T>() where T : GameComponent
+        public T AddComponent<T>() where T : Component, new ()
         {
-            T component = (T)Activator.CreateInstance(typeof(T), gameInstance);
+            //leaving this here to remember this class
+            //T component = (T)Activator.CreateInstance(typeof(T), gameInstance);
+            T component = new T();
+            component.Owner = this;
+            component.GameInstance = gameInstance;
 
             components.Add(component);
             gameInstance.Components.Add(component);
@@ -28,11 +32,11 @@ namespace Raycasting_Projection.GameObjects
             return component;
         }
 
-        public void RemoveComponent<T>() where T : GameComponent
+        public void RemoveComponent<T>() where T : Component
         {
-            foreach(GameComponent comp in components)
+            foreach(Component comp in components)
             {
-                if((T)comp != null)
+                if(comp is T)
                 {
                     gameInstance.Components.Remove(comp);
                     components.Remove(comp);
@@ -41,13 +45,13 @@ namespace Raycasting_Projection.GameObjects
             }
         }
 
-        public T GetComponent<T>() where T : GameComponent
+        public T GetComponent<T>() where T : Component
         {
             if(components.Count > 0)
             {
-                foreach(GameComponent component in components)
+                foreach(Component component in components)
                 {
-                    if ((T)component != null)
+                    if (component is T)
                         return (T)component;
                 }
             }
@@ -55,16 +59,15 @@ namespace Raycasting_Projection.GameObjects
             return null;
         }
 
-        public T[] GetComponents<T>() where T : GameComponent
+        public T[] GetComponents<T>() where T : Component
         {
-            List<T> found = null;
-
             if(components.Count > 0)
             {
-                found = new List<T>();
-                foreach(GameComponent comp in components)
+                List<T> found = new List<T>();
+                
+                foreach(Component comp in components)
                 {
-                    if ((T)comp != null)
+                    if (comp is T)
                         found.Add((T)comp);
                 }
                 if (found.Count > 0)

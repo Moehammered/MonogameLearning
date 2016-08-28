@@ -1,21 +1,21 @@
-﻿using Cameras_and_Primitives;
+﻿using System;
+using Cameras_and_Primitives;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Raycasting_Projection.GameObjects;
 
 namespace Raycasting_Projection.Components
 {
-    class MeshRendererComponent : DrawableGameComponent
+    class MeshRendererComponent : RenderComponent
     {
         public Color colour;
-        public GameObject owner;
 
         protected VertexBuffer buffer;
         protected IndexBuffer indexBuffer;
         protected StaticMesh mesh;
         protected BasicEffect material;
         
-        public MeshRendererComponent(Game g) : base(g)
+        public MeshRendererComponent() : base()
         {
             //do nothing
         }
@@ -27,7 +27,7 @@ namespace Raycasting_Projection.Components
             material.VertexColorEnabled = true;
             material.DiffuseColor = colour.ToVector3();
 
-            base.Initialize();
+            //base.Initialize();
         }
 
         public override void Draw(GameTime gameTime)
@@ -47,7 +47,12 @@ namespace Raycasting_Projection.Components
                     GraphicsDevice.DrawIndexedPrimitives(mesh.TriangleType, 0, 0, mesh.TriangleCount);
                 }
             }
-            base.Draw(gameTime);
+            //base.Draw(gameTime);
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            //does nothing, might reconsider inheritance hierarchy
         }
 
         public StaticMesh Mesh
@@ -66,6 +71,12 @@ namespace Raycasting_Projection.Components
                     indexBuffer.SetData<ushort>(mesh.Indices);
                 }
             }
+        }
+
+        public BasicEffect Material
+        {
+            get { return material; }
+            set { if (value != null) material = value; }
         }
     }
 }

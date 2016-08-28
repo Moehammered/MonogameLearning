@@ -1,70 +1,91 @@
-﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
+using Raycasting_Projection.Components;
+using Cameras_and_Primitives;
 
-namespace Cameras_and_Primitives
+namespace Raycasting_Projection.Utilities
 {
-    class TexturedCube
+    static class PrimitiveShape
     {
-        private float width, height, depth;
-        public StaticPrimitiveMesh mesh;
-        //Not used yet
-        private Texture2D texture;
+        #region Static Plane Mesh (XY plane)
 
-        public TexturedCube()
+        public static StaticMesh CreateXYPlane()
         {
-            width = height = depth = 1;
+            StaticMesh mesh;
+            mesh = new StaticMesh();
+            mesh.Vertices = makePlaneXYVertices(Color.White);
+            mesh.Indices = makePlaneXYIndices();
+
+            return mesh;
         }
 
-        public void initialise(GraphicsDevice gd, Texture2D texture)
+        private static VertexData[] makePlaneXYVertices(Color colour)
         {
-            mesh = new StaticPrimitiveMesh(gd);
+            VertexData[] verts = new VertexData[4]; //4 points on the plane
+            //temp variable to make it easier to read
+            VertexData dummy = new VertexData();
+            //top left vertex (origin being at the center of the object)
+            dummy.position = new Vector3(-0.5f, 0.5f, 0);
+            dummy.colour = colour;
+            dummy.uv = new Vector2(0, 0);
+            dummy.normal = new Vector3(0, 0, 1);
+            verts[0] = dummy;
+            //top right vertex
+            dummy.position.X = 0.5f;
+            dummy.uv.X = 1;
+            verts[1] = dummy;
+            //bottom right vertex
+            dummy.position.Y = -0.5f;
+            dummy.uv.Y = 1;
+            verts[2] = dummy;
+            //bottom left vertex
+            dummy.position.X = -0.5f;
+            dummy.uv.X = 0;
+            verts[3] = dummy;
+
+            return verts;
+        }
+
+        private static ushort[] makePlaneXYIndices()
+        {
+            ushort[] inds = {
+                0, 1, 3, 2
+            };
+
+            return inds;
+        }
+
+        #endregion
+
+        #region Static Cube Mesh
+
+        public static StaticMesh CreateCube()
+        {
+            StaticMesh mesh;
+            float width, height, depth;
+
+            mesh = new StaticMesh();
+            width = height = depth = 1;
             mesh.useTriangleList();
             VertexData[] vertices = new VertexData[36];
-            Vector3[] positions = buildPoint();
-            Vector3[] normals = buildNormals();
-            Vector2[] uvs = buildUVs();
-
+            Vector3[] positions = buildCubePoints(width, height, depth);
+            Vector3[] normals = buildCubeNormals();
+            Vector2[] uvs = buildCubeUVs();
             Color colour = Color.White;
 
             for(int i = 0; i < vertices.Length; i++)
             {
-                switch (i)
-                {
-                    case 0: //front
-                        colour = Color.White;
-                        break;
-                    case 6: //back
-                        colour = Color.Red;
-                        break;
-                    case 12: //right
-                        colour = Color.Blue;
-                        break;
-                    case 18: //left
-                        colour = Color.Yellow;
-                        break;
-                    case 24: //top
-                        colour = Color.Green;
-                        break;
-                    case 30: //bottom
-                        colour = Color.Gray;
-                        break;
-                }
-                vertices[i] = new VertexData(positions[i], normals[i], uvs[i]);
-                vertices[i].colour = colour;
+                vertices[i] = new VertexData(positions[i], normals[i], uvs[i], colour);
             }
 
             mesh.Vertices = vertices;
-            mesh.Indices = buildIndices();
-            this.texture = texture;
+            mesh.Indices = buildCubeIndices();
+
+            return mesh;
         }
 
-        public void draw()
-        {
-            mesh.draw();
-        }
-
-        private Vector3[] buildPoint()
+        private static Vector3[] buildCubePoints(float width, float height, float depth)
         {
             //half sizes
             float halfWidth, halfHeight, halfDepth;
@@ -87,27 +108,27 @@ namespace Cameras_and_Primitives
             //build the positions of each vertex now
             List<Vector3> points = new List<Vector3>(36);
 
-            for(int i = 0; i < points.Capacity; i+=6)
+            for (int i = 0; i < points.Capacity; i += 6)
             {
-                switch(i)
+                switch (i)
                 {
                     case 0:     //construct front face
-                        points.InsertRange(points.Count, buildFace(FTL, FTR, FBR, FBL));
+                        points.InsertRange(points.Count, buildCubeFace(FTL, FTR, FBR, FBL));
                         break;
                     case 6:     //construct back face
-                        points.InsertRange(points.Count, buildFace(BTR, BTL, BBL, BBR));
+                        points.InsertRange(points.Count, buildCubeFace(BTR, BTL, BBL, BBR));
                         break;
                     case 12:    //construct right face
-                        points.InsertRange(points.Count, buildFace(FTR, BTR, BBR, FBR));
+                        points.InsertRange(points.Count, buildCubeFace(FTR, BTR, BBR, FBR));
                         break;
                     case 18:    //construct left face
-                        points.InsertRange(points.Count, buildFace(BTL, FTL, FBL, BBL));
+                        points.InsertRange(points.Count, buildCubeFace(BTL, FTL, FBL, BBL));
                         break;
                     case 24:    //construct top face
-                        points.InsertRange(points.Count, buildFace(BTL, BTR, FTR, FTL));
+                        points.InsertRange(points.Count, buildCubeFace(BTL, BTR, FTR, FTL));
                         break;
                     case 30:    //construct bottom face
-                        points.InsertRange(points.Count, buildFace(FBL, FBR, BBR, BBL));
+                        points.InsertRange(points.Count, buildCubeFace(FBL, FBR, BBR, BBL));
                         break;
                     default:    //something went wrong
                         break;
@@ -117,10 +138,10 @@ namespace Cameras_and_Primitives
             return points.ToArray();
         }
 
-        private ushort[] buildIndices()
+        private static ushort[] buildCubeIndices()
         {
             ushort[] indices = new ushort[36];
-            for(ushort i = 0; i < indices.Length; i++)
+            for (ushort i = 0; i < indices.Length; i++)
             {
                 indices[i] = i;
             }
@@ -128,14 +149,14 @@ namespace Cameras_and_Primitives
             return indices;
         }
 
-        private Vector3[] buildNormals()
+        private static Vector3[] buildCubeNormals()
         {
             Vector3 frontFace = new Vector3(0, 0, 1);
             Vector3 rightFace = new Vector3(1, 0, 0);
             Vector3 topFace = new Vector3(0, 1, 0);
 
             Vector3[] normals = new Vector3[36];
-            for(int i = 0; i < normals.Length; i++)
+            for (int i = 0; i < normals.Length; i++)
             {
                 Vector3 normal = Vector3.One;
 
@@ -158,7 +179,7 @@ namespace Cameras_and_Primitives
             return normals;
         }
 
-        private Vector2[] buildUVs()
+        private static Vector2[] buildCubeUVs()
         {
             List<Vector2> uvs = new List<Vector2>(36);
             //fill in the gap.
@@ -167,9 +188,9 @@ namespace Cameras_and_Primitives
             Vector2 uvStart = Vector2.Zero;
             Vector2 uvEnd = Vector2.Zero;
 
-            for(int i = 0; i < uvs.Capacity; i+=6)
+            for (int i = 0; i < uvs.Capacity; i += 6)
             {
-                switch(i)
+                switch (i)
                 {
                     case 0:
                         uvEnd.X = xSegment;
@@ -194,13 +215,13 @@ namespace Cameras_and_Primitives
                         break;
                 }
 
-                uvs.InsertRange(uvs.Count, buildFaceUVS(uvStart, uvEnd));
+                uvs.InsertRange(uvs.Count, buildCubeFaceUVS(uvStart, uvEnd));
             }
 
             return uvs.ToArray();
         }
 
-        private Vector3[] buildFace(Vector3 tl, Vector3 tr, Vector3 br, Vector3 bl)
+        private static Vector3[] buildCubeFace(Vector3 tl, Vector3 tr, Vector3 br, Vector3 bl)
         {
             Vector3[] points = new Vector3[6];
             //triangle 1
@@ -215,7 +236,7 @@ namespace Cameras_and_Primitives
             return points;
         }
 
-        private Vector2[] buildFaceUVS(Vector2 start, Vector2 end)
+        private static Vector2[] buildCubeFaceUVS(Vector2 start, Vector2 end)
         {
             Vector2[] uvs = new Vector2[6];
             //triangle 1 - left tri
@@ -229,5 +250,7 @@ namespace Cameras_and_Primitives
 
             return uvs;
         }
+
+        #endregion
     }
 }

@@ -7,7 +7,7 @@ namespace Raycasting_Projection.Utilities
     {
         /*
         http://gamedev.stackexchange.com/questions/15070/orienting-a-model-to-face-a-target
-        Really helped with getting this to work, after spending hours implementing the damn thing.
+        Really helped with getting this to work, after spending hours implementing and testing.
         http://answers.unity3d.com/questions/534907/difficulty-understanding-lookrotation.html
         http://gamedev.stackexchange.com/questions/15070/orienting-a-model-to-face-a-target
         http://stackoverflow.com/questions/12435671/quaternion-lookat-function

@@ -63,7 +63,8 @@ namespace Raycasting_Projection.Utilities
 
         public void Rotate(float x, float y, float z)
         {
-            Rotation = Quaternion.CreateFromYawPitchRoll(y, x, z);
+            Rotation = Quaternion.CreateFromYawPitchRoll(MathHelper.ToRadians(y), 
+                MathHelper.ToRadians(x), MathHelper.ToRadians(z));
         }
 
         public void Translate(float x, float y, float z)
@@ -76,6 +77,13 @@ namespace Raycasting_Projection.Utilities
         public void Translate(Vector3 delta)
         {
             position += delta;
+        }
+
+        public void lookAt(Vector3 target)
+        {
+            Vector3 newDir = target - position;
+            newDir.Normalize();
+            Rotation = Rotation.LookRotation(Vector3.Forward, newDir, Vector3.Up);
         }
     }
 }
