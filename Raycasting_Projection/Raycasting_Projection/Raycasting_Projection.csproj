@@ -45,6 +45,7 @@
     <Compile Include="Components\Component.cs" />
     <Compile Include="Components\AnimatedTank.cs" />
     <Compile Include="Components\MoveToComponent.cs" />
+    <Compile Include="Components\PlayerController.cs" />
     <Compile Include="Components\RenderComponent.cs" />
     <Compile Include="Components\StaticMesh.cs" />
     <Compile Include="Components\MeshRendererComponent.cs" />

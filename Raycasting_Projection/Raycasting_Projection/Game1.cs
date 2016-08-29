@@ -21,18 +21,11 @@ namespace Raycasting_Projection
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Time timer;
-        KeyboardState prevState;
-        Vector2 oldMousePos = Vector2.Zero;
         #endregion
         #region Meshes
         Model skybox;
         Matrix skyboxWorld;
         Vector3 skyboxOffset;
-        #endregion
-        #region Camera Settings
-        Vector3 camPos, camRot;
-        float moveSpeed = 20f, lookSensitivity = 10;
-        float groundHeight = 3, jumpVelocity = 0, jumpForce = 10;
         #endregion
         #region GameObjects
         GameObject camera;
@@ -63,13 +56,6 @@ namespace Raycasting_Projection
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            //create the camera gameObject
-            camera = new GameObject(this);
-            camera.transform.Position = new Vector3(0, groundHeight, 10);
-            camera.AddComponent<Camera>();
-            camPos = camera.transform.Position;
-            camRot = Vector3.Zero;
-
             //create the ground plane gameObject
             plane = new GameObject(this);
             plane.transform.Position = Vector3.Zero;
@@ -83,9 +69,15 @@ namespace Raycasting_Projection
             planeMaxPoint = plane.transform.Position + new Vector3(plane.transform.Scale.X / 2, 0, plane.transform.Scale.Y / 2);
             planeCollider = new BoundingBox(planeMinPoint, planeMaxPoint);
 
+            //create the camera gameObject
+            camera = new GameObject(this);
+            camera.transform.Position = new Vector3(0, 3, 10);
+            PlayerController pController = camera.AddComponent<PlayerController>();
+            pController.groundHeight = 3;
+            camera.AddComponent<Camera>();
+            pController.pickingVolume = planeCollider;
             //setup the game utlities
             timer = Time.Instance;
-            oldMousePos = Mouse.GetState().Position.ToVector2();
             skyboxOffset = Vector3.Down / 8f;
 
             //Create the tank gameObject
@@ -97,7 +89,7 @@ namespace Raycasting_Projection
             tankMove.MinimumDistance = 1;
             tankMove.speed = 2;
             AnimatedTankMover tankMover = tank.AddComponent<AnimatedTankMover>();
-            tankMover.pickingVolume = planeCollider;
+            pController.tankMover = tankMover;
 
             base.Initialize();
         }
@@ -139,12 +131,7 @@ namespace Raycasting_Projection
 
             timer.tick(ref gameTime);
             // TODO: Add your update logic here
-            moveCamera();
-            rotateCamera();
-
-            applyGravity();
-            //store the keyboard state to check for single press instead of held down press
-            prevState = Keyboard.GetState();
+            
             base.Update(gameTime);
         }
 
@@ -161,103 +148,7 @@ namespace Raycasting_Projection
 
             base.Draw(gameTime);
         }
-
-        #region Camera Movement
-
-        private void moveCamera()
-        {
-            KeyboardState keyState = Keyboard.GetState();
-            Vector3 normalisedMovement = Vector3.Zero;
-
-            checkJumpKey();
-            if (keyState.IsKeyDown(Keys.W))
-            {
-                //camPos.Z -= moveSpeed * timer.DeltaTime;
-                //camera.Position = camPos;
-                normalisedMovement += camera.transform.Forward;
-            }
-            else if (keyState.IsKeyDown(Keys.S))
-            {
-                //camPos.Z += moveSpeed * timer.DeltaTime;
-                //camera.Position = camPos;
-                normalisedMovement -= camera.transform.Forward;
-            }
-            if (keyState.IsKeyDown(Keys.A))
-            {
-                //camPos.X -= moveSpeed * timer.DeltaTime;
-                //camera.Position = camPos;
-                normalisedMovement -= camera.transform.Right;
-            }
-            else if (keyState.IsKeyDown(Keys.D))
-            {
-                //camPos.X += moveSpeed * timer.DeltaTime;
-                //camera.Position = camPos;
-                normalisedMovement += camera.transform.Right;
-            }
-            //if movement has occured at all
-            if (normalisedMovement.LengthSquared() > 0)
-            {
-                normalisedMovement.Y = 0; //remove any verticallity
-                //create a normalised direction
-                normalisedMovement.Normalize();
-                //apply the movement
-                camPos += normalisedMovement * moveSpeed * timer.DeltaTime;
-                //now apply any jumping velocity if there is any
-                camPos.Y += jumpVelocity * timer.DeltaTime;
-                //correct our position if we've fallen below the ground
-                if (camPos.Y < groundHeight)
-                    camPos.Y = groundHeight;
-                //update camera's position
-                camera.transform.Position = camPos;
-            }
-            else if (jumpVelocity != 0) //if we stand still and jump
-            {
-                camPos.Y += jumpVelocity * timer.DeltaTime;
-                if (camPos.Y < groundHeight)
-                    camPos.Y = groundHeight;
-                //update camera's position
-                camera.transform.Position = camPos;
-            }
-        }
-
-        private void checkJumpKey()
-        {
-            if (Keyboard.GetState().IsKeyDown(Keys.Space) && prevState.IsKeyUp(Keys.Space))
-            {
-                jumpVelocity = jumpForce;
-            }
-        }
-
-        private void rotateCamera()
-        {
-            Vector2 delta = Mouse.GetState().Position.ToVector2() - oldMousePos;
-            //apply the rotation angle change(degrees)
-            camRot.X -= lookSensitivity * delta.Y * timer.DeltaTime;
-            camRot.Y -= lookSensitivity * delta.X * timer.DeltaTime;
-
-            //if the mouse moves enough (for example, if mouse is left alone, don't want to update rotation)
-            if (camRot.LengthSquared() > 2)
-            {
-                //create the relevant angles in radians
-                float yaw = MathHelper.ToRadians(camRot.Y);
-                float pitch = MathHelper.ToRadians(camRot.X);
-                //this method requires the camRot to be normalised into radians
-                //camera.Rotation = Quaternion.CreateFromAxisAngle(camRot, 1f);
-                camera.transform.Rotation = Quaternion.CreateFromYawPitchRoll(yaw, pitch, 0);
-            }
-            oldMousePos = Mouse.GetState().Position.ToVector2();
-        }
-
-        private void applyGravity()
-        {
-            if (camPos.Y > groundHeight)
-                jumpVelocity -= timer.DeltaTime * 10;
-            else
-                jumpVelocity = 0;
-        }
-
-        #endregion
-
+        
         private void drawSkybox()
         {
             skyboxWorld = Matrix.CreateTranslation(camera.transform.Position + skyboxOffset);

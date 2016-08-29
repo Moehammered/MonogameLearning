@@ -9,17 +9,22 @@ namespace Raycasting_Projection.Components
 {
     class AnimatedTankMover : Component
     {
-        public BoundingBox pickingVolume;
         private MoveToComponent mover;
         private AnimatedTank tankModel;
         private Raycast raycaster;
-        
-        //here for now, once an input class is made will be replaced
-        private MouseState prevState;
 
         public AnimatedTankMover() : base()
         {
 
+        }
+
+        public Vector3 Destination
+        {
+            get { return mover.Destination; }
+            set
+            {
+                mover.Destination = value;
+            }
         }
 
         public override void Initialize()
@@ -27,30 +32,16 @@ namespace Raycasting_Projection.Components
             mover = owner.GetComponent<MoveToComponent>();
             tankModel = owner.GetComponent<AnimatedTank>();
             raycaster = new Raycast(GameInstance.GraphicsDevice);
+            mover.MinimumDistance = 2;
+            mover.speed = 4;
+            mover.snapRotation = false;
         }
 
         public override void Update(GameTime gameTime)
         {
-            checkInput();
             animateTank();
-
-            prevState = Mouse.GetState();
         }
-
-        private void checkInput()
-        {
-            if(Mouse.GetState().LeftButton == ButtonState.Pressed && prevState.LeftButton != ButtonState.Pressed)
-            {
-                raycaster.setupMatrices(Camera.mainCamera.World, Camera.mainCamera.View, Camera.mainCamera.Projection);
-                RaycastResult info;
-                if(raycaster.cast(Mouse.GetState().Position.ToVector2(), pickingVolume, out info))
-                {
-                    //move the tank
-                    mover.Destination = info.contactPoint;
-                }
-            }
-        }
-
+        
         private void animateTank()
         {
             if(!mover.Arrived)
