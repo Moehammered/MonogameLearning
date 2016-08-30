@@ -1,9 +1,9 @@
-﻿using System;
-using Microsoft.Xna.Framework;
-using MovingTextDemo;
-using Raycasting_Projection.Utilities;
+﻿using Microsoft.Xna.Framework;
+using MonogameLearning.BaseComponents;
+using MonogameLearning.Graphics;
+using MonogameLearning.Utilities;
 
-namespace Raycasting_Projection.Components
+namespace MonogameLearning.GameComponents
 {
     class MoveToComponent : Component
     {
