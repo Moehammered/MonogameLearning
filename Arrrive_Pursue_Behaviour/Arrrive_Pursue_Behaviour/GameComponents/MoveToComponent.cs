@@ -8,15 +8,15 @@ namespace MonogameLearning.GameComponents
     class MoveToComponent : Component
     {
         public float speed;
-        public bool snapRotation = true;
-
+        //public bool snapRotation = true;
+        protected bool arrived;
+        protected Vector3 destination;
         private float minDistance;
         private float minDistanceSquared;
-        private Vector3 destination;
-        private bool arrived;
+        /*
         private Quaternion startRot, endRot;
         private float steerDuration = 2;
-        private float rotTimer;
+        private float rotTimer;*/
 
         public MoveToComponent() : base()
         {
@@ -42,13 +42,15 @@ namespace MonogameLearning.GameComponents
             get { return minDistanceSquared; }
         }
 
-        public Vector3 Destination
+        public virtual Vector3 Destination
         {
             get { return destination; }
             set
             {
                 destination = value;
                 arrived = false;
+                owner.transform.lookAt(destination);
+                /*
                 //need to rotate to look at destination
                 if(snapRotation)
                     owner.transform.lookAt(destination);
@@ -59,7 +61,7 @@ namespace MonogameLearning.GameComponents
                     newDir.Normalize();
                     endRot = startRot.LookRotation(Vector3.Forward, newDir, Vector3.Up);
                     rotTimer = 0;
-                }
+                }*/
                 //then that allows it to simply move forward
             }
         }
@@ -78,14 +80,15 @@ namespace MonogameLearning.GameComponents
         {
             if(!arrived)
             {
-                //then if we aren't snapping rotation, steer towards destination
-                if (!snapRotation)
-                    steerToDestination();
-                //move
-                owner.transform.Translate(owner.transform.Forward * speed * Time.Instance.DeltaTime);
+                move();
                 
                 checkDistance();
             }
+        }
+
+        protected virtual void move()
+        {
+            owner.transform.Translate(owner.transform.Forward * speed * Time.Instance.DeltaTime);
         }
 
         private void checkDistance()
@@ -95,14 +98,14 @@ namespace MonogameLearning.GameComponents
                 arrived = true;
         }
 
-        private void steerToDestination()
+        /*private void steerToDestination()
         {
             /*if(rotTimer < 1)
             {
                 rotTimer += Time.Instance.DeltaTime/steerDuration;
                 //owner.transform.Rotation = Quaternion.Slerp(startRot, endRot, rotTimer);
                 owner.transform.Rotation = Quaternion.Lerp(owner.transform.Rotation, calculateLookRotation(), 0.01f);
-            }*/
+            }
             owner.transform.Rotation = Quaternion.Lerp(owner.transform.Rotation, calculateLookRotation(), Time.Instance.DeltaTime);
         }
 
@@ -111,6 +114,6 @@ namespace MonogameLearning.GameComponents
             Vector3 newDir = destination - owner.transform.Position;
             newDir.Normalize();
             return startRot.LookRotation(Vector3.Forward, newDir, Vector3.Up);
-        }
+        }*/
     }
 }

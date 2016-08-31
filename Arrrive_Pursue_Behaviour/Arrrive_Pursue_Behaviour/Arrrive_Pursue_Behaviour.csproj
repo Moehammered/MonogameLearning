@@ -24,6 +24,7 @@
     <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -37,11 +38,15 @@
   <PropertyGroup>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="GameComponents\AnimatedTank.cs" />
     <Compile Include="GameComponents\AnimatedTankMover.cs" />
     <Compile Include="BaseComponents\Camera.cs" />
     <Compile Include="BaseComponents\Component.cs" />
+    <Compile Include="GameComponents\ArriveAtComponent.cs" />
     <Compile Include="Utilities\ExtensionUtilities.cs" />
     <Compile Include="ArrivePursueDemo.cs" />
     <Compile Include="BaseComponents\GameObject.cs" />

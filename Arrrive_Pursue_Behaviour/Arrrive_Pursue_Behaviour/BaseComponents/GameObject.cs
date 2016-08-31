@@ -75,5 +75,17 @@ namespace MonogameLearning.BaseComponents
             return null;
         }
         
+        /*public static GameObject Clone(ref GameObject prefab)
+        {
+            GameObject clone = null;
+            
+            clone = new GameObject(prefab.gameInstance);
+            clone.components = new List<Component>(prefab.components.Count);
+            for(int i = 0; i < prefab.components.Count; i++)
+            {
+                //clone.components.Add(prefab.components[i].)
+            }
+            return clone;
+        }*/
     }
 }

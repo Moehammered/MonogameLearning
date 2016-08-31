@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Arrrive_Pursue_Behaviour.GameComponents;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonogameLearning.BaseComponents;
@@ -176,9 +177,11 @@ namespace Arrrive_Pursue_Behaviour
             tank.transform.Position = new Vector3(0, 0, 1);
             tank.transform.Scale = new Vector3(0.01f, 0.01f, 0.01f);
             tank.AddComponent<AnimatedTank>();
-            MoveToComponent tankMove = tank.AddComponent<MoveToComponent>();
-            tankMove.MinimumDistance = 1;
-            tankMove.speed = 2;
+            ArriveAtComponent tankArriver = tank.AddComponent<ArriveAtComponent>();
+            tankArriver.MinimumDistance = 1;
+            tankArriver.speed = 4;
+            tankArriver.SlowdownRadius = 4;
+            tankArriver.arrivalSpeed = 1.5f;
             AnimatedTankMover tankMover = tank.AddComponent<AnimatedTankMover>();
             player.GetComponent<PlayerController>().tankMover = tankMover;
         }
