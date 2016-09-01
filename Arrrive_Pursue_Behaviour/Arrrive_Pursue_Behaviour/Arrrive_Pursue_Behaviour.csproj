@@ -7,7 +7,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{AF1B9785-8070-41B3-B675-FAC7F981BB76}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Arrrive_Pursue_Behaviour</RootNamespace>
     <AssemblyName>Arrrive_Pursue_Behaviour</AssemblyName>
@@ -47,6 +47,8 @@
     <Compile Include="BaseComponents\Camera.cs" />
     <Compile Include="BaseComponents\Component.cs" />
     <Compile Include="GameComponents\ArriveAtComponent.cs" />
+    <Compile Include="GameComponents\PursueComponent.cs" />
+    <Compile Include="Utilities\BinarySerialiser.cs" />
     <Compile Include="Utilities\ExtensionUtilities.cs" />
     <Compile Include="ArrivePursueDemo.cs" />
     <Compile Include="BaseComponents\GameObject.cs" />

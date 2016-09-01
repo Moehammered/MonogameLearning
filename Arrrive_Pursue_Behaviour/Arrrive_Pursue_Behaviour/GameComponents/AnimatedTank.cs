@@ -32,6 +32,11 @@ namespace MonogameLearning.GameComponents
         //used to tell component to update the matrices of the transforms
         private bool updateWheels = false, updateSteer = false, updateTurret = false;
 
+        public AnimatedTank() : base()
+        {
+
+        }
+
         public float WheelRotation
         {
             get { return wheelRotationValue; }
@@ -160,6 +165,7 @@ namespace MonogameLearning.GameComponents
         public override void Initialize()
         {
             model = GameInstance.Content.Load<Model>("Tank/tank");
+            System.Console.WriteLine("Model: " + model.GetHashCode());
             cacheBones();
             cacheTransforms();
             boneTransforms = new Matrix[model.Bones.Count];

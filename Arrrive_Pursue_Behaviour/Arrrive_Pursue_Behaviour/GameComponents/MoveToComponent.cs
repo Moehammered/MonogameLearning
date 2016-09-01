@@ -7,12 +7,13 @@ namespace MonogameLearning.GameComponents
 {
     class MoveToComponent : Component
     {
-        public float speed;
+        
         //public bool snapRotation = true;
         protected bool arrived;
         protected Vector3 destination;
         private float minDistance;
         private float minDistanceSquared;
+        protected float speed, currentSpeed;
         /*
         private Quaternion startRot, endRot;
         private float steerDuration = 2;
@@ -25,6 +26,21 @@ namespace MonogameLearning.GameComponents
             destination = Vector3.Zero;
             speed = 1;
             arrived = true;
+            currentSpeed = 0;
+        }
+
+        public float Speed
+        {
+            get { return speed; }
+            set
+            {
+                speed = value;
+            }
+        }
+
+        public float CurrentSpeed
+        {
+            get { return currentSpeed; }
         }
 
         public float MinimumDistance
@@ -50,6 +66,7 @@ namespace MonogameLearning.GameComponents
                 destination = value;
                 arrived = false;
                 owner.transform.lookAt(destination);
+                currentSpeed = speed;
                 /*
                 //need to rotate to look at destination
                 if(snapRotation)
@@ -88,14 +105,17 @@ namespace MonogameLearning.GameComponents
 
         protected virtual void move()
         {
-            owner.transform.Translate(owner.transform.Forward * speed * Time.Instance.DeltaTime);
+            owner.transform.Translate(owner.transform.Forward * currentSpeed * Time.Instance.DeltaTime);
         }
 
         private void checkDistance()
         {
             Vector3 offset = destination - owner.transform.Position;
-            if(offset.LengthSquared() < minDistanceSquared)
+            if (offset.LengthSquared() < minDistanceSquared)
+            {
                 arrived = true;
+                currentSpeed = 0;
+            }
         }
 
         /*private void steerToDestination()

@@ -31,7 +31,7 @@ namespace MonogameLearning.GameComponents
             tankModel = owner.GetComponent<AnimatedTank>();
             raycaster = new Raycast(GameInstance.GraphicsDevice);
             mover.MinimumDistance = 2;
-            mover.speed = 4;
+            mover.Speed = 4;
             mover.steerDuration = 1.5f;
         }
 
@@ -44,8 +44,8 @@ namespace MonogameLearning.GameComponents
         {
             if(!mover.Arrived)
             {
-                tankModel.WheelRotation += Time.Instance.DeltaTime * mover.speed;
-                tankModel.TurretRotation += Time.Instance.DeltaTime * mover.speed;
+                tankModel.WheelRotation += Time.Instance.DeltaTime * mover.CurrentSpeed;
+                tankModel.TurretRotation += Time.Instance.DeltaTime * mover.CurrentSpeed;
             }
         }
     }

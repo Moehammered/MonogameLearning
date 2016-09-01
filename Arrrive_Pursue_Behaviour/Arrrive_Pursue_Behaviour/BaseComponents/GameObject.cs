@@ -1,5 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Arrrive_Pursue_Behaviour.Utilities;
+using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace MonogameLearning.BaseComponents
 {
@@ -75,16 +78,26 @@ namespace MonogameLearning.BaseComponents
             return null;
         }
         
+        public void BroadcastMessage(string methodName)
+        {
+            foreach(Component comp in components)
+            {
+                //send message event to the object to notify collision
+                MethodInfo method = comp.GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
+                if(method != null)
+                    method.Invoke(comp, null);
+            }
+        }
+
         /*public static GameObject Clone(ref GameObject prefab)
         {
             GameObject clone = null;
-            
-            clone = new GameObject(prefab.gameInstance);
-            clone.components = new List<Component>(prefab.components.Count);
-            for(int i = 0; i < prefab.components.Count; i++)
-            {
-                //clone.components.Add(prefab.components[i].)
-            }
+            BinarySerialiser serialiser = new BinarySerialiser();
+
+            string serialGraph = serialiser.serialiseObject(prefab);
+            clone = serialiser.loadData<GameObject>(serialGraph);
+            Console.WriteLine("Cloned? " + (clone != null));
+
             return clone;
         }*/
     }

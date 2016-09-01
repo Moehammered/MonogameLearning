@@ -42,6 +42,7 @@ namespace Arrrive_Pursue_Behaviour.GameComponents
             {
                 destination = value;
                 arrived = false;
+                currentSpeed = speed;
                 startRot = owner.transform.Rotation;
             }
         }
@@ -50,9 +51,11 @@ namespace Arrrive_Pursue_Behaviour.GameComponents
         {
             performSteerRotation();
             if (nearDistination())
-                owner.transform.Translate(owner.transform.Forward * arrivalSpeed * Time.Instance.DeltaTime);
+                currentSpeed = arrivalSpeed;
             else
-                owner.transform.Translate(owner.transform.Forward * speed * Time.Instance.DeltaTime);
+                currentSpeed = speed;
+
+            owner.transform.Translate(owner.transform.Forward * currentSpeed * Time.Instance.DeltaTime);
         }
 
         private bool nearDistination()
