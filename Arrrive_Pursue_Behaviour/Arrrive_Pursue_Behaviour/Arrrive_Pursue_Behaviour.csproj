@@ -42,6 +42,8 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BaseComponents\BoxCollider.cs" />
+    <Compile Include="BaseComponents\ColliderComponent.cs" />
     <Compile Include="GameComponents\AnimatedTank.cs" />
     <Compile Include="GameComponents\AnimatedTankMover.cs" />
     <Compile Include="BaseComponents\Camera.cs" />
@@ -49,6 +51,7 @@
     <Compile Include="GameComponents\ArriveAtComponent.cs" />
     <Compile Include="GameComponents\PursueComponent.cs" />
     <Compile Include="Utilities\BinarySerialiser.cs" />
+    <Compile Include="Utilities\CollisionDetector.cs" />
     <Compile Include="Utilities\ExtensionUtilities.cs" />
     <Compile Include="ArrivePursueDemo.cs" />
     <Compile Include="BaseComponents\GameObject.cs" />

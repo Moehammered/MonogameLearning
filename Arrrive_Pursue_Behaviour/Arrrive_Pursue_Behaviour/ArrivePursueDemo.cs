@@ -1,4 +1,6 @@
-﻿using Arrrive_Pursue_Behaviour.GameComponents;
+﻿using Arrrive_Pursue_Behaviour.BaseComponents;
+using Arrrive_Pursue_Behaviour.GameComponents;
+using Arrrive_Pursue_Behaviour.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -37,6 +39,7 @@ namespace Arrrive_Pursue_Behaviour
         private Matrix skyboxWorld;
         private Vector3 skyboxOffset;
         #endregion
+        CollisionDetector collisionSystem;
         BoundingBox arriveTankBox, pursueTankBox;
         List<GameObject> collisionCache;
 
@@ -50,6 +53,7 @@ namespace Arrrive_Pursue_Behaviour
             graphics.PreferredBackBufferHeight = screenHeight;
             graphics.ApplyChanges();
             collisionCache = new List<GameObject>(2);
+            collisionSystem = new CollisionDetector();
         }
 
         /// <summary>
@@ -61,6 +65,7 @@ namespace Arrrive_Pursue_Behaviour
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            Services.AddService<CollisionDetector>(collisionSystem);
             createGroundGameObject();
             createPlayerGameObject();
             //setup a tank gameobject with arrival behaviour
@@ -103,6 +108,8 @@ namespace Arrrive_Pursue_Behaviour
                 BoundingBox bound = BoundingBox.CreateFromSphere(mesh.BoundingSphere);
                 tankBound = BoundingBox.CreateMerged(tankBound, bound);
             }
+            arriveTank.GetComponent<BoxCollider>().UnScaledBounds = tankBound;
+            pursueTank.GetComponent<BoxCollider>().UnScaledBounds = tankBound;
             arriveTankBox = tankBound;
             arriveTankBox.Min *= arriveTank.transform.Scale;
             arriveTankBox.Max *= arriveTank.transform.Scale;
@@ -141,6 +148,8 @@ namespace Arrrive_Pursue_Behaviour
             // TODO: Add your update logic here
             timer.tick(ref gameTime);
 
+            collisionSystem.checkCollisions();
+            /*
             //collision testing experiment
             BoundingBox temp1, temp2;
             temp1 = arriveTankBox;
@@ -175,7 +184,7 @@ namespace Arrrive_Pursue_Behaviour
                     collisionCache.Remove(pursueTank);
                     collisionCache.Remove(arriveTank);
                 }
-            }
+            }*/
             base.Update(gameTime);
         }
 
@@ -253,6 +262,7 @@ namespace Arrrive_Pursue_Behaviour
             newTank.transform.Position = new Vector3(x, 0, z);
             newTank.transform.Scale = new Vector3(0.01f, 0.01f, 0.01f);
             newTank.AddComponent<AnimatedTank>();
+            newTank.AddComponent<BoxCollider>();
             AnimatedTankMover tankMover = newTank.AddComponent<AnimatedTankMover>();
             /*ArriveAtComponent tankArriver = tank.AddComponent<ArriveAtComponent>();
             tankArriver.MinimumDistance = 1;

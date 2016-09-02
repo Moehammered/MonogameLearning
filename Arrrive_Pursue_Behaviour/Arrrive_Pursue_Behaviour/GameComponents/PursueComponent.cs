@@ -121,11 +121,13 @@ namespace Arrrive_Pursue_Behaviour.GameComponents
         private void OnCollision()
         {
             Console.WriteLine("Pursue Collided");
+            speed = 0;
         }
 
         private void OnCollisionExit()
         {
             Console.WriteLine("Pursue not colliding!");
+            speed = 3;
         }
     }
 }
