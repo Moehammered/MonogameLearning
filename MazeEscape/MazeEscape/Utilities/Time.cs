@@ -26,7 +26,17 @@ namespace MonogameLearning.Utilities
             }
         }
 
-        public float DeltaTime
+        public static float DeltaTime
+        {
+            get { return Instance.deltaTime; }
+        }
+
+        public static float TotalTime
+        {
+            get { return Instance.currentTime; }
+        }
+
+        public float InstanceDeltaTime
         {
             get
             {
@@ -34,7 +44,7 @@ namespace MonogameLearning.Utilities
             }
         }
 
-        public float TotalTime
+        public float InstanceTotalTime
         {
             get
             {
