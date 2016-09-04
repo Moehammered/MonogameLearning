@@ -41,6 +41,8 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="GameComponents\FirstPersonController.cs" />
+    <Compile Include="GameComponents\FirstPersonMover.cs" />
     <Compile Include="GameUtilities\LevelLoader.cs" />
     <Compile Include="Graphics\PrimitiveShape.cs" />
     <Compile Include="Graphics\StaticMesh.cs" />
@@ -77,9 +79,7 @@
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="GameComponents\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
