@@ -7,6 +7,7 @@ namespace MonogameLearning.GameComponents
     class AnimatedTank : RenderComponent
     {
         #region Tank Data
+        public string modelName;
         private Model model;
         private ModelBone[] wheelBones;
         private ModelBone[] steerBones;
@@ -34,7 +35,7 @@ namespace MonogameLearning.GameComponents
 
         public AnimatedTank() : base()
         {
-
+            modelName = "Tank/tank";
         }
 
         public float WheelRotation
@@ -164,8 +165,7 @@ namespace MonogameLearning.GameComponents
         
         public override void Initialize()
         {
-            model = GameInstance.Content.Load<Model>("Tank/tank");
-            System.Console.WriteLine("Model: " + model.GetHashCode());
+            model = GameInstance.Content.Load<Model>(modelName);
             cacheBones();
             cacheTransforms();
             boneTransforms = new Matrix[model.Bones.Count];

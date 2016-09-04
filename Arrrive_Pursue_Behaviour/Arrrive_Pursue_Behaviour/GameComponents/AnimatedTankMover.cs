@@ -16,15 +16,6 @@ namespace MonogameLearning.GameComponents
 
         }
 
-        public Vector3 Destination
-        {
-            get { return mover.Destination; }
-            set
-            {
-                mover.Destination = value;
-            }
-        }
-
         public override void Initialize()
         {
             mover = owner.GetComponent<ArriveAtComponent>();

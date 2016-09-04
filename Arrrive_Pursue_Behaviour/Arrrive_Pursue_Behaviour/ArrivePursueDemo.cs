@@ -27,6 +27,7 @@ namespace Arrrive_Pursue_Behaviour
         private int screenWidth = 1280, screenHeight = 720;
         private string windowTitle = "Arrive and Pursue Behaviour";
         private Time timer;
+        private CollisionDetector collisionSystem;
         #endregion
         #region GameObjects
         private GameObject player;
@@ -39,9 +40,6 @@ namespace Arrrive_Pursue_Behaviour
         private Matrix skyboxWorld;
         private Vector3 skyboxOffset;
         #endregion
-        CollisionDetector collisionSystem;
-        BoundingBox arriveTankBox, pursueTankBox;
-        List<GameObject> collisionCache;
 
         public ArrivePursueDemo()
         {
@@ -52,7 +50,6 @@ namespace Arrrive_Pursue_Behaviour
             graphics.PreferredBackBufferWidth = screenWidth;
             graphics.PreferredBackBufferHeight = screenHeight;
             graphics.ApplyChanges();
-            collisionCache = new List<GameObject>(2);
             collisionSystem = new CollisionDetector();
         }
 
@@ -65,28 +62,31 @@ namespace Arrrive_Pursue_Behaviour
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            //register the collision detector as a service of this game. This allows bounding boxes to register themselves to the collision detector.
             Services.AddService<CollisionDetector>(collisionSystem);
             createGroundGameObject();
             createPlayerGameObject();
+
             //setup a tank gameobject with arrival behaviour
-            arriveTank = createTankGameObject(1, 10);
+            arriveTank = createTankGameObject(1, 10, "Tank/tank");
             ArriveAtComponent arriver = arriveTank.AddComponent<ArriveAtComponent>();
             arriver.MinimumDistance = 1;
             arriver.Speed = 6;
             arriver.SlowdownRadius = 3;
             arriver.arrivalSpeed = 2;
+
             //setup a tank gameobject with pursue behaviour
-            pursueTank = createTankGameObject(0, -10);
-            pursueTank.RemoveComponent<AnimatedTankMover>();
-            
+            pursueTank = createTankGameObject(0, -10, "Tank/tank2");
             PursueComponent purs = pursueTank.AddComponent<PursueComponent>();
             purs.Target = arriveTank;
-            purs.speed = 4;
+            purs.Speed = 5;
             purs.RefreshRate = 0.1f;
+
             //give the player's controller a reference to the arrival tank
             PlayerController pControl = player.GetComponent<PlayerController>();
-            pControl.tankMover = arriveTank.GetComponent<AnimatedTankMover>();
+            pControl.tankMover = arriveTank.GetComponent<ArriveAtComponent>();
 
+            //store the instance of the Timer that tracks deltaTime
             timer = Time.Instance;
 
             //initialises all components in the GameComponentCollection
@@ -101,24 +101,20 @@ namespace Arrrive_Pursue_Behaviour
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            //get a reference of the tankModel
             Model tankModel = Content.Load<Model>("Tank/tank");
+
+            //create a bounding box that surrounds the tank by encapsulating all of it's meshes bounding spheres
             BoundingBox tankBound = new BoundingBox();
             foreach(ModelMesh mesh in tankModel.Meshes)
             {
                 BoundingBox bound = BoundingBox.CreateFromSphere(mesh.BoundingSphere);
                 tankBound = BoundingBox.CreateMerged(tankBound, bound);
             }
+            //set the unscaled bounding box of each tank
             arriveTank.GetComponent<BoxCollider>().UnScaledBounds = tankBound;
             pursueTank.GetComponent<BoxCollider>().UnScaledBounds = tankBound;
-            arriveTankBox = tankBound;
-            arriveTankBox.Min *= arriveTank.transform.Scale;
-            arriveTankBox.Max *= arriveTank.transform.Scale;
-            pursueTankBox = tankBound;
-            pursueTankBox.Min *= pursueTank.transform.Scale;
-            pursueTankBox.Max *= pursueTank.transform.Scale;
-            Console.WriteLine("Tank bounds: " + tankBound);
-            Console.WriteLine("Arrive bounds: " + arriveTankBox);
-            Console.WriteLine("Pursue bounds: " + pursueTankBox);
+            
             // TODO: use this.Content to load your game content here
             setupSkybox();
             MeshRendererComponent groundRend = ground.GetComponent<MeshRendererComponent>();
@@ -146,46 +142,15 @@ namespace Arrrive_Pursue_Behaviour
                 Exit();
 
             // TODO: Add your update logic here
+
+            //track deltatime
             timer.tick(ref gameTime);
 
-            collisionSystem.checkCollisions();
-            /*
-            //collision testing experiment
-            BoundingBox temp1, temp2;
-            temp1 = arriveTankBox;
-            temp2 = pursueTankBox;
-            //adjust the bounding box to follow
-            //arrive tank's bounding box adjustment
-            temp1.Min += arriveTank.transform.Position;
-            temp1.Max += arriveTank.transform.Position;
-            //pursue tank's bounding box adjustment
-            temp2.Min += pursueTank.transform.Position;
-            temp2.Max += pursueTank.transform.Position;
-
-            if (temp2.Intersects(temp1))
-            {
-                //Console.WriteLine("Pursuer collided!");
-                if (!collisionCache.Contains(pursueTank))
-                {
-                    string methodName = "OnCollision";
-                    PursueComponent pt = pursueTank.GetComponent<PursueComponent>();
-                    collisionCache.Add(pursueTank);
-                    collisionCache.Add(arriveTank);
-                    pursueTank.BroadcastMessage(methodName);
-                    pt.speed = 0;
-                }
-            }
-            else
-            {
-                if(collisionCache.Contains(pursueTank))
-                {
-                    pursueTank.GetComponent<PursueComponent>().speed = 2;
-                    pursueTank.BroadcastMessage("OnCollisionExit");
-                    collisionCache.Remove(pursueTank);
-                    collisionCache.Remove(arriveTank);
-                }
-            }*/
+            //update all components
             base.Update(gameTime);
+
+            //check for collisions within registered bounding boxes
+            collisionSystem.checkCollisions();
         }
 
         /// <summary>
@@ -255,13 +220,14 @@ namespace Arrrive_Pursue_Behaviour
             pController.pickingVolume = groundCollider;
         }
 
-        private GameObject createTankGameObject(float x, float z)
+        private GameObject createTankGameObject(float x, float z, string modelName)
         {
             GameObject newTank = new GameObject(this);
 
             newTank.transform.Position = new Vector3(x, 0, z);
             newTank.transform.Scale = new Vector3(0.01f, 0.01f, 0.01f);
-            newTank.AddComponent<AnimatedTank>();
+            AnimatedTank anim = newTank.AddComponent<AnimatedTank>();
+            anim.modelName = modelName;
             newTank.AddComponent<BoxCollider>();
             AnimatedTankMover tankMover = newTank.AddComponent<AnimatedTankMover>();
             /*ArriveAtComponent tankArriver = tank.AddComponent<ArriveAtComponent>();

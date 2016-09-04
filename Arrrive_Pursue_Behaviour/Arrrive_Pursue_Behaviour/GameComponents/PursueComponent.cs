@@ -10,21 +10,17 @@ using MonogameLearning.Utilities;
 
 namespace Arrrive_Pursue_Behaviour.GameComponents
 {
-    class PursueComponent : Component
+    class PursueComponent : ArriveAtComponent
     {
-        public float speed;
-        
         private GameObject pursueTarget;
         private MoveToComponent mover;
-        private float refreshRate, refreshTimer;
-        private float stopDistance, stopDistSqr;
-        private Vector3 destination;
+        private float refreshRate, refreshTimer, pursueCooldown;
 
         public PursueComponent() : base()
         {
             refreshRate = 0.5f;
-            stopDistance = 1;
-            stopDistSqr = 1;
+            refreshTimer = refreshRate;
+            steerDuration = 0.5f;
         }
 
         public float RefreshRate
@@ -34,21 +30,6 @@ namespace Arrrive_Pursue_Behaviour.GameComponents
             {
                 refreshRate = (value > 0) ? value : 0;
             }
-        }
-
-        public float StopDistance
-        {
-            get { return stopDistance; }
-            set
-            {
-                stopDistance = value;
-                stopDistSqr = stopDistance * stopDistance;
-            }
-        }
-
-        public float StopDistanceSquared
-        {
-            get { return stopDistSqr; }
         }
 
         public GameObject Target
@@ -70,12 +51,11 @@ namespace Arrrive_Pursue_Behaviour.GameComponents
 
         public override void Initialize()
         {
-
         }
 
-        public override void Update(GameTime gameTime)
+        protected override void move()
         {
-            if(mover != null)
+            if (mover != null)
             {
                 refreshTimer -= Time.Instance.DeltaTime;
                 if (refreshTimer < 0)
@@ -84,13 +64,23 @@ namespace Arrrive_Pursue_Behaviour.GameComponents
 
                     refreshTimer = refreshRate;
                 }
-                if (!hasArrived())
+                base.move();
+            }
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            if(!arrived)
+            {
+                move();
+            }
+            else if(pursueCooldown > 0)
+            {
+                pursueCooldown -= Time.Instance.DeltaTime;
+                if(pursueCooldown < 0)
                 {
-                    //check if we need to refresh trajectory
-                    
-                    //move towards target location
-                    performSteerRotation();
-                    owner.transform.Translate(owner.transform.Forward * speed * Time.Instance.DeltaTime);
+                    arrived = false;
+                    currentSpeed = speed;
                 }
             }
         }
@@ -99,35 +89,23 @@ namespace Arrrive_Pursue_Behaviour.GameComponents
         {
             Vector3 targetDir = mover.Owner.transform.Forward;
             float targetSpeed = mover.CurrentSpeed;
-            destination = mover.Owner.transform.Position + targetDir * targetSpeed;
-            //Console.WriteLine("Curr Dest: " + destination);
-        }
-
-        private bool hasArrived()
-        {
-            return (destination - owner.transform.Position).LengthSquared() < stopDistSqr;
-        }
-
-        private void performSteerRotation()
-        {
-            Vector3 newDir = destination - owner.transform.Position;
-            newDir.Normalize();
-            Quaternion desiredRot, currentRot;
-            currentRot = owner.transform.Rotation;
-            desiredRot = Quaternion.Identity.LookRotation(Vector3.Forward, newDir, Vector3.Up);
-            owner.transform.Rotation = Quaternion.Lerp(currentRot, desiredRot, Time.Instance.DeltaTime);
+            Vector3 gradient = mover.Owner.transform.Position - owner.transform.Position;
+            float timeToTarget = gradient.Length() / (currentSpeed + 0.01f); //+0.01f so there is no divide by 0 when pursuer stops
+            Destination = mover.Owner.transform.Position + (targetDir * targetSpeed) * timeToTarget;
         }
 
         private void OnCollision()
         {
-            Console.WriteLine("Pursue Collided");
-            speed = 0;
+            //Console.WriteLine("Pursue Collided");
+            currentSpeed = 0;
+            arrived = true;
         }
 
         private void OnCollisionExit()
         {
-            Console.WriteLine("Pursue not colliding!");
-            speed = 3;
+            //Console.WriteLine("Pursue not colliding!");
+            //start a cooldown to let the pursuer chase again
+            pursueCooldown = 1;
         }
     }
 }

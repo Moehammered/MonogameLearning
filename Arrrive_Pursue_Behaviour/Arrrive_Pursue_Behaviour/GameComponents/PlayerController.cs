@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Arrrive_Pursue_Behaviour.GameComponents;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using MonogameLearning.BaseComponents;
 using MonogameLearning.Utilities;
@@ -7,7 +8,7 @@ namespace MonogameLearning.GameComponents
 {
     class PlayerController : Component
     {
-        public AnimatedTankMover tankMover;
+        public ArriveAtComponent tankMover;
         public BoundingBox pickingVolume;
         public float moveSpeed;
         public float lookSensitivity;

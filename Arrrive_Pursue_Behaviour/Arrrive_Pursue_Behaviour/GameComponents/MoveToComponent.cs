@@ -7,17 +7,11 @@ namespace MonogameLearning.GameComponents
 {
     class MoveToComponent : Component
     {
-        
-        //public bool snapRotation = true;
         protected bool arrived;
         protected Vector3 destination;
         private float minDistance;
         private float minDistanceSquared;
         protected float speed, currentSpeed;
-        /*
-        private Quaternion startRot, endRot;
-        private float steerDuration = 2;
-        private float rotTimer;*/
 
         public MoveToComponent() : base()
         {
@@ -67,19 +61,6 @@ namespace MonogameLearning.GameComponents
                 arrived = false;
                 owner.transform.lookAt(destination);
                 currentSpeed = speed;
-                /*
-                //need to rotate to look at destination
-                if(snapRotation)
-                    owner.transform.lookAt(destination);
-                else
-                {
-                    startRot = owner.transform.Rotation;
-                    Vector3 newDir = destination - owner.transform.Position;
-                    newDir.Normalize();
-                    endRot = startRot.LookRotation(Vector3.Forward, newDir, Vector3.Up);
-                    rotTimer = 0;
-                }*/
-                //then that allows it to simply move forward
             }
         }
 
@@ -99,7 +80,7 @@ namespace MonogameLearning.GameComponents
             {
                 move();
                 
-                checkDistance();
+                checkForArrival();
             }
         }
 
@@ -108,7 +89,7 @@ namespace MonogameLearning.GameComponents
             owner.transform.Translate(owner.transform.Forward * currentSpeed * Time.Instance.DeltaTime);
         }
 
-        private void checkDistance()
+        protected void checkForArrival()
         {
             Vector3 offset = destination - owner.transform.Position;
             if (offset.LengthSquared() < minDistanceSquared)
@@ -117,23 +98,5 @@ namespace MonogameLearning.GameComponents
                 currentSpeed = 0;
             }
         }
-
-        /*private void steerToDestination()
-        {
-            /*if(rotTimer < 1)
-            {
-                rotTimer += Time.Instance.DeltaTime/steerDuration;
-                //owner.transform.Rotation = Quaternion.Slerp(startRot, endRot, rotTimer);
-                owner.transform.Rotation = Quaternion.Lerp(owner.transform.Rotation, calculateLookRotation(), 0.01f);
-            }
-            owner.transform.Rotation = Quaternion.Lerp(owner.transform.Rotation, calculateLookRotation(), Time.Instance.DeltaTime);
-        }
-
-        private Quaternion calculateLookRotation()
-        {
-            Vector3 newDir = destination - owner.transform.Position;
-            newDir.Normalize();
-            return startRot.LookRotation(Vector3.Forward, newDir, Vector3.Up);
-        }*/
     }
 }
