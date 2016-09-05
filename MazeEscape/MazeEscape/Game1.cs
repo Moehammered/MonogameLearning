@@ -19,9 +19,13 @@ namespace MazeEscape
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        SpriteFont font;
+        private int screenWidth = 1280, screenHeight = 720;
         private Time timer;
         private GameObject camera;
+        private FirstPersonController player;
         private GameObject groundPlane;
+        private GameObject goal;
         private LevelLoader levelLoader;
         private GameObject[,] levelTiles;
         private Random random;
@@ -31,6 +35,9 @@ namespace MazeEscape
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            graphics.PreferredBackBufferWidth = screenWidth;
+            graphics.PreferredBackBufferHeight = screenHeight;
+            graphics.ApplyChanges();
             levelLoader = new LevelLoader();
             random = new Random();
             collisionService = new CollisionDetector();
@@ -53,6 +60,7 @@ namespace MazeEscape
             {
                 Console.WriteLine("Constructing level");
                 levelTiles = constructLevel(level);
+                //constructWalls(level);
             }
             //Console.WriteLine("Level1 Exist? " + levelLoader.loadLevel("Level1.txt", out level));
             camera = new GameObject(this);
@@ -63,8 +71,25 @@ namespace MazeEscape
             camera.transform.Position = startPos;
             camera.AddComponent<Camera>();
             camera.AddComponent<FirstPersonMover>();
-            camera.AddComponent<FirstPersonController>();
+            player = camera.AddComponent<FirstPersonController>();
 
+            goal = new GameObject(this);
+            int randX, randZ;
+            randX = random.Next(levelTiles.GetLength(0));
+            randZ = random.Next(levelTiles.GetLength(1));
+            Vector3 goalPos = levelTiles[randX, randZ].transform.Position;
+            goalPos.Y += 1f;
+            goal.transform.Position = goalPos;
+            MeshRendererComponent rend = goal.AddComponent<MeshRendererComponent>();
+            rend.colour = Color.Green;
+            rend.Mesh = PrimitiveShape.CreateCube();
+            BoxCollider collider = goal.AddComponent<BoxCollider>();
+            Vector3 minPoint, maxPoint;
+            minPoint = new Vector3(-0.5f, -0.5f, -0.5f);
+            maxPoint = minPoint * -1;
+            collider.UnScaledBounds = new BoundingBox(minPoint, maxPoint);
+            BoxCollider playCol = camera.AddComponent<BoxCollider>();
+            playCol.UnScaledBounds = new BoundingBox(minPoint, maxPoint);
             /*groundPlane = new GameObject(this);
             MeshRendererComponent renderer = groundPlane.AddComponent<MeshRendererComponent>();
             renderer.Mesh = PrimitiveShape.CreateXYPlane();
@@ -80,7 +105,7 @@ namespace MazeEscape
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
+            font = Content.Load<SpriteFont>("Arial");
             // TODO: use this.Content to load your game content here
         }
 
@@ -105,6 +130,7 @@ namespace MazeEscape
 
             // TODO: Add your update logic here
             timer.tick(ref gameTime);
+            collisionService.checkCollisions();
 
             base.Update(gameTime);
             //keep track of pressed buttons this frame before going to next
@@ -122,6 +148,16 @@ namespace MazeEscape
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
+            renderHUD();
+        }
+
+        private void renderHUD()
+        {
+            spriteBatch.Begin();
+            spriteBatch.DrawString(font, "FPS: " + 1/Time.DeltaTime, new Vector2(screenWidth / 2, screenHeight / 10), Color.Red);
+            spriteBatch.DrawString(font, "Reached Goal: " + player.hitGoal, new Vector2(screenWidth / 8, screenHeight / 10), Color.Red);
+            spriteBatch.End();
+            GraphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
         }
 
         private GameObject[,] constructLevel(LevelData level)
@@ -133,7 +169,7 @@ namespace MazeEscape
                 for(int z = 0; z < level.rows; z++)
                 {
                     GameObject tile = new GameObject(this);
-                    tile.transform.Position = new Vector3(x, 0, -z);
+                    tile.transform.Position = new Vector3(x, 0, z);
                     tile.transform.Rotate(270, 0, 0);
                     BoxCollider collider = tile.AddComponent<BoxCollider>();
                     collider.UnScaledBounds = box;
@@ -160,6 +196,28 @@ namespace MazeEscape
             }
 
             return tiles;
+        }
+
+        private GameObject[] constructWalls(LevelData level, int height = 4)
+        {
+            GameObject[] walls = new GameObject[(level.columns * 2 + level.rows * 2)*height];
+            for(int x = 0; x < level.columns*2; x++)
+            {
+                for(int y = 1; y < height; y++)
+                {
+                    GameObject wall = new GameObject(this);
+                    MeshRendererComponent rend=wall.AddComponent<MeshRendererComponent>();
+                    rend.Mesh = PrimitiveShape.CreateCube();
+                    rend.colour = Color.Black;
+                    if(x < level.columns)
+                        wall.transform.Position = new Vector3(x, y, 0);
+                    else
+                        wall.transform.Position = new Vector3(x-level.columns, y, level.rows);
+                    walls[x*y] = wall;
+                }
+            }
+
+            return walls;
         }
     }
 }

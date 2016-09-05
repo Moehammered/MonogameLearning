@@ -8,6 +8,7 @@ namespace MazeEscape.GameComponents
 {
     class FirstPersonController : Component
     {
+        public bool hitGoal = false;
         private Keys[] movementKeys;
         private Vector3 movementDirection;
         private FirstPersonMover fpMover;
@@ -92,6 +93,12 @@ namespace MazeEscape.GameComponents
         private void checkCameraMovement()
         {
             fpMover.look(-Input.HorizontalDelta, -Input.VerticalDelta, 0);
+        }
+
+        private void OnCollision()
+        {
+            Console.WriteLine("Player COllided");
+            hitGoal = true;
         }
     }
 }
