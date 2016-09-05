@@ -3,17 +3,22 @@ using Microsoft.Xna.Framework;
 using MonogameLearning.BaseComponents;
 using Microsoft.Xna.Framework.Input;
 using MazeEscape.Utilities;
+using MonogameLearning.Utilities;
+using Microsoft.Xna.Framework.Audio;
 
 namespace MazeEscape.GameComponents
 {
     class FirstPersonController : Component
     {
-        public bool hitGoal = false;
+        public SoundEffectInstance moveSound, deathSound, winSound;
+        public bool hitGoal = false, dead = false;
+        public int points;
         private Keys[] movementKeys;
         private Vector3 movementDirection;
         private FirstPersonMover fpMover;
         private const int FORWARD_KEY = 0, BACK_KEY = 1, 
             LEFT_KEY = 2, RIGHT_KEY = 3, MAX_KEYS = 4;
+        private float stunTimer = 1;
 
         public FirstPersonController()
         {
@@ -23,6 +28,7 @@ namespace MazeEscape.GameComponents
             BackwardKey = Keys.S;
             LeftKey = Keys.A;
             RightKey = Keys.D;
+            points = 0;
         }
 
         public Keys ForwardKey
@@ -56,14 +62,24 @@ namespace MazeEscape.GameComponents
             if (fpMover == null)
                 fpMover = owner.AddComponent<FirstPersonMover>();
             fpMover.lookSensitivity = 20;
-            fpMover.speed = 4;
+            fpMover.speed = 3;
         }
 
         public override void Update(GameTime gameTime)
         {
-            checkCameraMovement();
-            checkMovementKeys();
-            fpMover.move(movementDirection);
+            if (!dead)
+            {
+                checkCameraMovement();
+                if (stunTimer < 0)
+                {
+                    checkMovementKeys();
+                    fpMover.move(movementDirection);
+                }
+                else
+                {
+                    stunTimer -= Time.DeltaTime;
+                }
+            }
         }
 
         private void checkMovementKeys()
@@ -86,8 +102,17 @@ namespace MazeEscape.GameComponents
             {
                 movementDirection += owner.transform.Right;
             }
-            if(movementDirection.LengthSquared() > 0)
+            if (movementDirection.LengthSquared() > 0)
+            {
                 movementDirection.Normalize();
+                if (moveSound != null)
+                {
+                    if (moveSound.State == SoundState.Stopped)
+                        moveSound.Play();
+                }
+            }
+            else if(moveSound != null)
+                moveSound.Stop();
         }
 
         private void checkCameraMovement()
@@ -99,6 +124,45 @@ namespace MazeEscape.GameComponents
         {
             Console.WriteLine("Player COllided");
             hitGoal = true;
+            fpMover.move(-movementDirection);
+            stunTimer = 0.5f;
+        }
+
+        public void OnCollision(GameObject other)
+        {
+            Console.WriteLine("Player Collided with: " + other.name);
+            if (other.name == "goal")
+            {
+                hitGoal = true;
+                if (winSound != null)
+                    winSound.Play();
+                moveSound.Stop();
+            }
+            else if (other.name == "hazard")
+            {
+                dead = true;
+                if (deathSound != null)
+                    deathSound.Play();
+                moveSound.Stop();
+            }
+            else if(other.name == "pickup")
+            {
+                points++;
+                winSound.Play();
+                other.RemoveComponent<MeshRendererComponent>(); //remove rendering of pickup
+                other.transform.Translate(0, -1000, 0); //move it out of the way to avoid unnecessary repeated collisions
+            }
+            else
+            {
+                fpMover.move(-movementDirection);
+                stunTimer = 0.5f;
+            }
+        }
+
+        private void OnCollisionExit()
+        {
+            Console.WriteLine("Player left");
+            hitGoal = false;
         }
     }
 }

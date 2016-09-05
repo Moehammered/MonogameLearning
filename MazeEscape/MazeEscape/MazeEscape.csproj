@@ -41,11 +41,15 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="GameComponents\ArriveAtComponent.cs" />
     <Compile Include="GameComponents\FirstPersonController.cs" />
     <Compile Include="GameComponents\FirstPersonMover.cs" />
+    <Compile Include="GameComponents\Hazard.cs" />
     <Compile Include="GameUtilities\LevelLoader.cs" />
     <Compile Include="Graphics\PrimitiveShape.cs" />
     <Compile Include="Graphics\StaticMesh.cs" />
+    <Compile Include="GameComponents\MoveToComponent.cs" />
+    <Compile Include="GameComponents\PursueComponent.cs" />
     <Compile Include="Utilities\BinarySerialiser.cs" />
     <Compile Include="BaseComponents\BoxCollider.cs" />
     <Compile Include="BaseComponents\Camera.cs" />

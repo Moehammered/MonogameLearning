@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -6,6 +7,7 @@ namespace MonogameLearning.BaseComponents
 {
     class GameObject
     {
+        public string name;
         public Transform transform;
         private List<Component> components;
         private Game gameInstance;
@@ -15,6 +17,7 @@ namespace MonogameLearning.BaseComponents
             transform = new Transform();
             components = new List<Component>();
             gameInstance = game;
+            name = "GameObject";
         }
 
         public T AddComponent<T>() where T : Component, new ()
@@ -84,6 +87,19 @@ namespace MonogameLearning.BaseComponents
                 MethodInfo method = comp.GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
                 if(method != null)
                     method.Invoke(comp, null);
+            }
+        }
+
+        public void BroadcastMessage(string methodName, GameObject otherObject)
+        {
+            foreach (Component comp in components)
+            {
+                //send message event to the object to notify collision
+                //MethodInfo method = comp.GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance, Binder, new ParameterModifier[] { new ParameterModifier(1) });
+                Type type = comp.GetType();
+                MethodInfo method = type.GetMethod("OnCollision", new[] { typeof(GameObject) });
+                if (method != null)
+                    method.Invoke(comp, new object[] { otherObject });
             }
         }
 
