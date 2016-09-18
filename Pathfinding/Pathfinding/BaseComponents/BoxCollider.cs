@@ -1,12 +1,7 @@
-﻿using Arrrive_Pursue_Behaviour.Utilities;
+﻿using MonogameLearning.Utilities;
 using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Arrrive_Pursue_Behaviour.BaseComponents
+namespace MonogameLearning.BaseComponents
 {
     class BoxCollider : ColliderComponent
     {

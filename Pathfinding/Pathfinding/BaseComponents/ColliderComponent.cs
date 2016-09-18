@@ -1,12 +1,6 @@
-﻿using MonogameLearning.BaseComponents;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 
-namespace Arrrive_Pursue_Behaviour.BaseComponents
+namespace MonogameLearning.BaseComponents
 {
     abstract class ColliderComponent : Component
     {

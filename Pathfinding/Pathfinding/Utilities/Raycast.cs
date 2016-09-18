@@ -1,15 +1,18 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonogameLearning.BaseComponents;
+using System.Collections.Generic;
 
 namespace MonogameLearning.Utilities
 {
-    public struct RaycastResult
+    struct RaycastResult
     {
         public float distance;
         public Vector3 contactPoint;
+        public BoxCollider collider;
     }
 
-    public class Raycast
+    class Raycast
     {
         private GraphicsDevice gd;
         private Matrix world, view, projection;
@@ -24,6 +27,36 @@ namespace MonogameLearning.Utilities
             this.world = world;
             this.view = view;
             this.projection = projection;
+        }
+
+        public bool cast(Vector2 mousePos, out RaycastResult result, List<BoxCollider> colliders)
+        {
+            Vector3 mouseNear, mouseFar, origin, end, dir;
+            result = new RaycastResult();
+            result.distance = float.PositiveInfinity;
+
+            mouseNear = new Vector3(mousePos, 0);
+            mouseFar = new Vector3(mousePos, 1);
+
+            origin = gd.Viewport.Unproject(mouseNear, projection, view, world);
+            end = gd.Viewport.Unproject(mouseFar, projection, view, world);
+            dir = end - origin;
+            dir.Normalize();
+
+            Ray ray = new Ray(origin, dir);
+            float? distance = null;
+            foreach(BoxCollider collider in colliders)
+            {
+                distance = ray.Intersects(collider.Bounds);
+                if(distance != null && result.distance > distance)
+                {
+                    result.contactPoint = dir * distance.Value + origin;
+                    result.distance = distance.Value;
+                    result.collider = collider;
+                }
+            }
+
+            return (result.collider != null);
         }
 
         public bool cast(Vector2 mousePos, BoundingBox collider, out RaycastResult result)

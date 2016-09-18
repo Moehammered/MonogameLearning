@@ -7,7 +7,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{307E81C8-6BFC-4C62-A912-738B6939C78A}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Pathfinding</RootNamespace>
     <AssemblyName>Pathfinding</AssemblyName>
@@ -37,7 +37,14 @@
   <PropertyGroup>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
+    <Compile Include="GameComponents\PlayerController.cs" />
+    <Compile Include="Pathfinding\GraphNode.cs" />
+    <Compile Include="Pathfinding\LevelGraph.cs" />
+    <Compile Include="Utilities\FileLoader.cs" />
     <Compile Include="GameComponents\ArriveAtComponent.cs" />
     <Compile Include="BaseComponents\BoxCollider.cs" />
     <Compile Include="BaseComponents\Camera.cs" />
@@ -45,6 +52,8 @@
     <Compile Include="BaseComponents\Component.cs" />
     <Compile Include="GameComponents\MoveToComponent.cs" />
     <Compile Include="GameComponents\PursueComponent.cs" />
+    <Compile Include="Utilities\LevelBuilder.cs" />
+    <Compile Include="Utilities\LevelLoader.cs" />
     <Compile Include="Utilities\Input.cs" />
     <Compile Include="Utilities\BinarySerialiser.cs" />
     <Compile Include="Utilities\CollisionDetector.cs" />

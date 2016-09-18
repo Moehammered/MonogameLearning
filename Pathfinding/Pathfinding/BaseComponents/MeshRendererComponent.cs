@@ -15,12 +15,11 @@ namespace MonogameLearning.BaseComponents
         
         public MeshRendererComponent() : base()
         {
-            //do nothing
+            colour = Color.White;
         }
 
         public override void Initialize()
         {
-            colour = Color.White;
             material = new BasicEffect(GraphicsDevice);
             material.VertexColorEnabled = true;
             material.DiffuseColor = colour.ToVector3();
