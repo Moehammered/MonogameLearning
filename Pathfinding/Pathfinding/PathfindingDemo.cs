@@ -8,6 +8,7 @@ using MonogameLearning.Utilities;
 using Pathfinding.GameComponents;
 using Pathfinding.Pathfinding;
 using Pathfinding.Utilities;
+using System.Collections.Generic;
 
 namespace Pathfinding
 {
@@ -56,7 +57,7 @@ namespace Pathfinding
             Services.AddService<CollisionDetector>(collisionService);
             
             levelBuilder.initialise();
-            levelBuilder.loadLevel("level0.txt");
+            levelBuilder.loadLevel("level2.txt");
 
             levelGraph = new LevelGraph(levelBuilder.LoadedLevelData);
             levelGraph.buildGraph();
@@ -137,6 +138,10 @@ namespace Pathfinding
                 node.X = player.selectedNode.position.X;
                 node.Y = player.selectedNode.position.Z;
                 message += "\nSelected Node: " + node;
+                List<GraphNode> nb = player.selectedNode.getNeightbours();
+                message += "\nSelected Neighbours: " + nb.Count;
+                foreach (GraphNode n in nb)
+                    message += "\nNeighbour Cost: " + n.TravelCost;
             }
             spriteBatch.DrawString(font, message, Vector2.Zero, Color.White);
             spriteBatch.End();

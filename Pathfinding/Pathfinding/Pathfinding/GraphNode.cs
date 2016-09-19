@@ -8,7 +8,7 @@ namespace Pathfinding.Pathfinding
         public Vector3 position;
         public GraphNode from;
         public bool seen = false;
-        private int cost, baseCost;
+        private float cost, baseCost;
         private List<GraphNode> neighbours;
 
         public GraphNode(int defaultCost)
@@ -20,12 +20,17 @@ namespace Pathfinding.Pathfinding
             from = null;
         }
 
-        public int Cost
+        public float TravelCost
+        {
+            get { return baseCost; }
+        }
+
+        public float CostSoFar
         {
             get { return cost; }
             set
             {
-                if (value > 0)
+                if (value >= 0)
                     cost = value;
                 else
                     cost = baseCost;

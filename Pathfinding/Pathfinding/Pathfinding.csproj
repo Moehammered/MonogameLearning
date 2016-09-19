@@ -42,7 +42,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="GameComponents\PlayerController.cs" />
+    <Compile Include="Pathfinding\AStarPathing.cs" />
     <Compile Include="Pathfinding\BreadthSearchPathing.cs" />
+    <Compile Include="Pathfinding\DijkstraPathing.cs" />
     <Compile Include="Pathfinding\GraphNode.cs" />
     <Compile Include="Pathfinding\LevelGraph.cs" />
     <Compile Include="Utilities\FileLoader.cs" />

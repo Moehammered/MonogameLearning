@@ -13,6 +13,8 @@ namespace Pathfinding.GameComponents
         public LevelGraph levelGraph;
         public GraphNode selectedNode, startNode;
         public BreadthSearchPathing pathfinder;
+        public DijkstraPathing dPath;
+        public AStarPathing aPath;
         private Raycast raycast;
         private GameObject lastClicked, currentClicked;
         private ArriveAtComponent mover;
@@ -27,10 +29,12 @@ namespace Pathfinding.GameComponents
             {
                 mover = owner.AddComponent<ArriveAtComponent>();
                 mover.Speed = 1;
-                mover.steerDuration = 0.5f;
-                mover.MinimumDistance = 0.1f;
+                mover.steerDuration = 0.25f;
+                mover.MinimumDistance = 0.25f;
             }
             pathfinder = new BreadthSearchPathing(levelGraph);
+            dPath = new DijkstraPathing(levelGraph);
+            aPath = new AStarPathing(levelGraph);
             currentPath = null;
         }
 
@@ -47,14 +51,8 @@ namespace Pathfinding.GameComponents
                 {
                     GraphNode clickedNode = levelGraph.getFromWorldPos(currentClicked.transform.Position);
                     GraphNode startNode = levelGraph.getFromWorldPos(owner.transform.Position);
-                    currentPath = pathfinder.findPath(startNode, clickedNode);
+                    currentPath = aPath.findPath(startNode, clickedNode);
                     System.Console.WriteLine("Current path: " + (currentPath != null));
-                    /*if (currentPath != null)
-                        currentPath.Pop();*/
-                    /*Vector3 pos = currentClicked.transform.Position;
-                    pos.Y = owner.transform.Position.Y;
-                    mover.Destination = pos;
-                    System.Console.WriteLine("Moving to: " + pos);*/
                 }
             }
             if(mover.Arrived)

@@ -10,7 +10,8 @@ namespace Pathfinding.Pathfinding
         private List<GraphNode> nodeGraph;
         private GraphNode[,] gridNodes;
         private LevelData level;
-        private const int GRASS_ID = 0, SAND_ID = 1, BLOCK_ID = 2;
+        private const int GRASS_ID = 0, SAND_ID = 1, BLOCK_ID = 2,
+            WATER_ID = 3, LAVA_ID = 4;
 
         public LevelGraph(LevelData level)
         {
@@ -76,7 +77,8 @@ namespace Pathfinding.Pathfinding
             {
                 for(int z = z1 - 1; z< z1+2; z++)
                 {
-                    if(x1 != x && z1 != z)
+                    bool isSelf = x1 == x & z1 == z;
+                    if (!isSelf)
                     {
                         GraphNode node = getNode(x, z);
                         if(node != null)
@@ -111,6 +113,10 @@ namespace Pathfinding.Pathfinding
                     return new GraphNode(2);
                 case BLOCK_ID:
                     return null;
+                case WATER_ID:
+                    return new GraphNode(5);
+                case LAVA_ID:
+                    return new GraphNode(10);
                 default:
                     return null;
             }
@@ -124,7 +130,7 @@ namespace Pathfinding.Pathfinding
         {
             foreach(GraphNode node in nodeGraph)
             {
-                node.Cost = 0;
+                node.CostSoFar = 0;
                 node.from = null;
                 node.seen = false;
             }

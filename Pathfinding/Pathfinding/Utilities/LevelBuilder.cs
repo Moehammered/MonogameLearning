@@ -12,7 +12,8 @@ namespace Pathfinding.Utilities
         private LevelLoader loader;
         private LevelData level;
         private List<GameObject> scene;
-        private const int GRASS_ID = 0, SAND_ID = 1, BLOCK_ID = 2;
+        private const int GRASS_ID = 0, SAND_ID = 1, BLOCK_ID = 2,
+            WATER_ID = 3, LAVA_ID = 4;
         private Game gameInstance;
 
         public LevelBuilder(Game inst)
@@ -43,7 +44,7 @@ namespace Pathfinding.Utilities
             else
             {
                 //construct a red cube at 0, 0, 0 for error
-                scene.Add(constructLevelObject(-1));
+                scene.Add(constructLevelObject(-1, Vector3.Zero));
             }
         }
 
@@ -55,14 +56,13 @@ namespace Pathfinding.Utilities
                 {
                     int tileID = level.getData(x, z);
                     //construct object and add it to the scene
-                    GameObject go = constructLevelObject(tileID);
-                    go.transform.Position = new Vector3(x, 0, z);
+                    GameObject go = constructLevelObject(tileID, new Vector3(x, 0, z));
                     scene.Add(go);
                 }
             }
         }
 
-        private GameObject constructLevelObject(int id)
+        private GameObject constructLevelObject(int id, Vector3 pos)
         {
             GameObject obj = null;
             Color colour = Color.White;
@@ -77,6 +77,13 @@ namespace Pathfinding.Utilities
                     break;
                 case BLOCK_ID:
                     colour = Color.Black;
+                    createObstacle(pos);
+                    break;
+                case WATER_ID:
+                    colour = Color.Aqua;
+                    break;
+                case LAVA_ID:
+                    colour = Color.OrangeRed;
                     break;
                 default:
                     colour = Color.Red;
@@ -84,8 +91,17 @@ namespace Pathfinding.Utilities
             }
 
             obj = createTile(colour);
-
+            obj.transform.Position = pos;
             return obj;
+        }
+
+        private void createObstacle(Vector3 pos)
+        {
+            GameObject obs = createTile(Color.Gray);
+            obs.RemoveComponent<BoxCollider>();
+            obs.transform.Position = pos;
+            obs.transform.Translate(0, 1, 0);
+            scene.Add(obs);
         }
 
         private GameObject createTile(Color col)
@@ -107,7 +123,7 @@ namespace Pathfinding.Utilities
             GameObject cam = new GameObject(gameInstance);
 
             cam.AddComponent<Camera>();
-            cam.transform.Position = new Vector3(5, 20, 20);
+            cam.transform.Position = new Vector3(5, 20, 30);
             cam.transform.lookAt(new Vector3(5, 0, 0));
             
             return cam;
