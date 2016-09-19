@@ -1,5 +1,6 @@
 ﻿using MazeEscape.GameUtilities;
 using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 
 namespace Pathfinding.Pathfinding
@@ -21,6 +22,14 @@ namespace Pathfinding.Pathfinding
         public List<GraphNode> NodeGraph
         {
             get { return nodeGraph; }
+        }
+
+        public GraphNode getFromWorldPos(Vector3 pos)
+        {
+            int x = (int)Math.Round(pos.X);
+            int z = (int)Math.Round(pos.Z);
+
+            return gridNodes[x, z];
         }
 
         public void buildGraph()
@@ -63,9 +72,9 @@ namespace Pathfinding.Pathfinding
         {
             List<GraphNode> nodes = new List<GraphNode>();
 
-            for(int x = x1 - 1; x < x1+1; x++)
+            for(int x = x1 - 1; x < x1+2; x++)
             {
-                for(int z = z1 - 1; z< z1+1; z++)
+                for(int z = z1 - 1; z< z1+2; z++)
                 {
                     if(x1 != x && z1 != z)
                     {
@@ -116,6 +125,8 @@ namespace Pathfinding.Pathfinding
             foreach(GraphNode node in nodeGraph)
             {
                 node.Cost = 0;
+                node.from = null;
+                node.seen = false;
             }
         }
     }

@@ -44,6 +44,7 @@ namespace Arrrive_Pursue_Behaviour.GameComponents
                 arrived = false;
                 currentSpeed = speed;
                 startRot = owner.transform.Rotation;
+                checkForArrival();
             }
         }
 

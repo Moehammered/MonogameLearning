@@ -6,6 +6,8 @@ namespace Pathfinding.Pathfinding
     class GraphNode
     {
         public Vector3 position;
+        public GraphNode from;
+        public bool seen = false;
         private int cost, baseCost;
         private List<GraphNode> neighbours;
 
@@ -15,6 +17,7 @@ namespace Pathfinding.Pathfinding
             cost = baseCost;
             position = Vector3.Zero;
             neighbours = new List<GraphNode>();
+            from = null;
         }
 
         public int Cost

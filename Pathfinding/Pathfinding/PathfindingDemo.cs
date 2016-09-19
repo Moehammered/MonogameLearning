@@ -24,6 +24,8 @@ namespace Pathfinding
         private LevelBuilder levelBuilder;
         private LevelGraph levelGraph;
         private GameObject playerCube;
+        private PlayerController player;
+        private SpriteFont font;
         private Time timer;
 
         public PathfindingDemo()
@@ -64,7 +66,8 @@ namespace Pathfinding
             cubeRend.Mesh = PrimitiveShape.CreateCube();
             cubeRend.colour = Color.Purple;
             playerCube.transform.Position = Vector3.One;
-            playerCube.AddComponent<PlayerController>();
+            player = playerCube.AddComponent<PlayerController>();
+            player.levelGraph = levelGraph;
 
             base.Initialize();
         }
@@ -78,6 +81,7 @@ namespace Pathfinding
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             // TODO: use this.Content to load your game content here
+            font = Content.Load<SpriteFont>("Arial");
         }
 
         /// <summary>
@@ -118,6 +122,25 @@ namespace Pathfinding
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
+            renderHUD();
+        }
+
+        private void renderHUD()
+        {
+            spriteBatch.Begin();
+            Vector2 node;
+            string message = "Start Node: ";
+            if (player.selectedNode != null && player.startNode != null)
+            {
+                node = new Vector2(player.startNode.position.X, player.startNode.position.Z);
+                message += node;
+                node.X = player.selectedNode.position.X;
+                node.Y = player.selectedNode.position.Z;
+                message += "\nSelected Node: " + node;
+            }
+            spriteBatch.DrawString(font, message, Vector2.Zero, Color.White);
+            spriteBatch.End();
+            GraphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
         }
     }
 }

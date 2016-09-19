@@ -4,14 +4,19 @@ using Microsoft.Xna.Framework;
 using MonogameLearning.Utilities;
 using MazeEscape.Utilities;
 using Arrrive_Pursue_Behaviour.GameComponents;
+using Pathfinding.Pathfinding;
 
 namespace Pathfinding.GameComponents
 {
     class PlayerController : Component
     {
+        public LevelGraph levelGraph;
+        public GraphNode selectedNode, startNode;
+        public BreadthSearchPathing pathfinder;
         private Raycast raycast;
         private GameObject lastClicked, currentClicked;
         private ArriveAtComponent mover;
+        private Stack<GraphNode> currentPath;
 
         public override void Initialize()
         {
@@ -25,6 +30,8 @@ namespace Pathfinding.GameComponents
                 mover.steerDuration = 0.5f;
                 mover.MinimumDistance = 0.1f;
             }
+            pathfinder = new BreadthSearchPathing(levelGraph);
+            currentPath = null;
         }
 
         public override void Update(GameTime gameTime)
@@ -38,10 +45,36 @@ namespace Pathfinding.GameComponents
             {
                 if(currentClicked != null)
                 {
-                    Vector3 pos = currentClicked.transform.Position;
+                    GraphNode clickedNode = levelGraph.getFromWorldPos(currentClicked.transform.Position);
+                    GraphNode startNode = levelGraph.getFromWorldPos(owner.transform.Position);
+                    currentPath = pathfinder.findPath(startNode, clickedNode);
+                    System.Console.WriteLine("Current path: " + (currentPath != null));
+                    /*if (currentPath != null)
+                        currentPath.Pop();*/
+                    /*Vector3 pos = currentClicked.transform.Position;
                     pos.Y = owner.transform.Position.Y;
                     mover.Destination = pos;
-                    System.Console.WriteLine("Moving to: " + pos);
+                    System.Console.WriteLine("Moving to: " + pos);*/
+                }
+            }
+            if(mover.Arrived)
+            {
+                //System.Console.WriteLine("Arrived.");
+                //do we have a path?
+                if(currentPath != null)
+                {
+                    System.Console.WriteLine("Have a path.");
+                    //are there any nodes left in the path?
+                    if(currentPath.Count > 0)
+                    {
+                        System.Console.WriteLine("Nodes still on path: " + currentPath.Count);
+                        //make the next node the destination
+                        GraphNode next = currentPath.Pop();
+                        Vector3 nextPos = next.position;
+                        nextPos.Y = owner.transform.Position.Y;
+                        mover.Destination = nextPos;
+                        System.Console.WriteLine("Moving to: " + nextPos);
+                    }
                 }
             }
         }
@@ -66,6 +99,12 @@ namespace Pathfinding.GameComponents
             currentClicked = obj;
             colourObject(lastClicked, false);
             colourObject(currentClicked, true);
+
+            if(currentClicked != null)
+            {
+                selectedNode = levelGraph.getFromWorldPos(currentClicked.transform.Position);
+                startNode = levelGraph.getFromWorldPos(owner.transform.Position);
+            }
         }
 
         private void colourObject(GameObject target, bool highlight)
