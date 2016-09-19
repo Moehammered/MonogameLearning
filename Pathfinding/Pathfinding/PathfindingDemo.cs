@@ -28,6 +28,7 @@ namespace Pathfinding
         private PlayerController player;
         private SpriteFont font;
         private Time timer;
+        private BasicEffect lineMaterial;
 
         public PathfindingDemo()
         {
@@ -52,12 +53,13 @@ namespace Pathfinding
         {
             // TODO: Add your initialization logic here
             timer = Time.Instance;
-
+            lineMaterial = new BasicEffect(GraphicsDevice);
             collisionService = new CollisionDetector();
             Services.AddService<CollisionDetector>(collisionService);
             
             levelBuilder.initialise();
             levelBuilder.loadLevel("level2.txt");
+            levelBuilder.buildLevel();
 
             levelGraph = new LevelGraph(levelBuilder.LoadedLevelData);
             levelGraph.buildGraph();
@@ -123,12 +125,52 @@ namespace Pathfinding
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
+            renderPathLines();
             renderHUD();
         }
 
         private void renderHUD()
         {
             spriteBatch.Begin();
+            displayClickedInfo();
+            displayPathInfo();
+            spriteBatch.End();
+            GraphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
+        }
+
+        private void displayPathInfo()
+        {
+            if (player.debugPath != null)
+            {
+                string message = "Current path\n";
+                for(int i = 0; i < player.debugPath.Length; i++)
+                {
+                    message += "Point[" + i + "]: " + player.debugPath[i].position + "\n";
+                }
+                spriteBatch.DrawString(font, message, new Vector2(windowWidth*0.75f, 0), Color.White);
+            }
+        }
+
+        private void renderPathLines()
+        {
+            if(player.debugPath != null)
+            {
+                lineMaterial.World = Camera.mainCamera.World;
+                lineMaterial.View = Camera.mainCamera.View;
+                lineMaterial.Projection = Camera.mainCamera.Projection;
+
+                foreach (EffectPass pass in lineMaterial.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    GraphicsDevice.DrawUserIndexedPrimitives<VertexPositionColor>(
+                        PrimitiveType.LineStrip, player.pathBuffer, 0, player.pathBuffer.Length,
+                        player.pathIndices, 0, player.pathIndices.Length - 1);
+                }
+            }
+        }
+
+        private void displayClickedInfo()
+        {
             Vector2 node;
             string message = "Start Node: ";
             if (player.selectedNode != null && player.startNode != null)
@@ -139,13 +181,11 @@ namespace Pathfinding
                 node.Y = player.selectedNode.position.Z;
                 message += "\nSelected Node: " + node;
                 List<GraphNode> nb = player.selectedNode.getNeightbours();
-                message += "\nSelected Neighbours: " + nb.Count;
+                message += "\nSelected Node Neighbours: " + nb.Count;
                 foreach (GraphNode n in nb)
-                    message += "\nNeighbour Cost: " + n.TravelCost;
+                    message += "\nNeighbour: " + n.position + " Cost: " + n.TravelCost;
             }
             spriteBatch.DrawString(font, message, Vector2.Zero, Color.White);
-            spriteBatch.End();
-            GraphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
         }
     }
 }

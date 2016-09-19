@@ -1,8 +1,8 @@
 ﻿using MazeEscape.GameUtilities;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using MonogameLearning.BaseComponents;
 using MonogameLearning.Graphics;
-using Pathfinding.GameComponents;
 using System.Collections.Generic;
 
 namespace Pathfinding.Utilities
@@ -15,6 +15,7 @@ namespace Pathfinding.Utilities
         private const int GRASS_ID = 0, SAND_ID = 1, BLOCK_ID = 2,
             WATER_ID = 3, LAVA_ID = 4;
         private Game gameInstance;
+        private bool loadSuccessful = false;
 
         public LevelBuilder(Game inst)
         {
@@ -36,7 +37,7 @@ namespace Pathfinding.Utilities
 
         public void loadLevel(string name)
         {
-            if(loader.loadLevel(name, out level))
+            /*if(loader.loadLevel(name, out level))
             {
                 //construct objects now
                 readLevelData();
@@ -45,7 +46,14 @@ namespace Pathfinding.Utilities
             {
                 //construct a red cube at 0, 0, 0 for error
                 scene.Add(constructLevelObject(-1, Vector3.Zero));
-            }
+            }*/
+            loadSuccessful = loader.loadLevel(name, out level);
+        }
+
+        public void buildLevel()
+        {
+            if (loadSuccessful)
+                readLevelData();
         }
 
         private void readLevelData()
@@ -66,6 +74,7 @@ namespace Pathfinding.Utilities
         {
             GameObject obj = null;
             Color colour = Color.White;
+            bool isBlock = false;
 
             switch (id)
             {
@@ -78,6 +87,7 @@ namespace Pathfinding.Utilities
                 case BLOCK_ID:
                     colour = Color.Black;
                     createObstacle(pos);
+                    isBlock = true;
                     break;
                 case WATER_ID:
                     colour = Color.Aqua;
@@ -92,6 +102,8 @@ namespace Pathfinding.Utilities
 
             obj = createTile(colour);
             obj.transform.Position = pos;
+            if (isBlock)
+                obj.RemoveComponent<BoxCollider>();
             return obj;
         }
 
@@ -101,6 +113,7 @@ namespace Pathfinding.Utilities
             obs.RemoveComponent<BoxCollider>();
             obs.transform.Position = pos;
             obs.transform.Translate(0, 1, 0);
+            obs.transform.Scale = Vector3.One / 2;
             scene.Add(obs);
         }
 
@@ -111,6 +124,22 @@ namespace Pathfinding.Utilities
             MeshRendererComponent renderer = tile.AddComponent<MeshRendererComponent>();
             renderer.Mesh = PrimitiveShape.CreateCube();
             renderer.colour = col;
+            BoxCollider collider = tile.AddComponent<BoxCollider>();
+            BoundingBox bounds = new BoundingBox(-Vector3.One / 2f, Vector3.One / 2f);
+            collider.UnScaledBounds = bounds;
+
+            return tile;
+        }
+
+        private GameObject createTile(Color col, Texture2D texture)
+        {
+            GameObject tile = new GameObject(gameInstance);
+
+            MeshRendererComponent renderer = tile.AddComponent<MeshRendererComponent>();
+            renderer.Mesh = PrimitiveShape.CreateCube();
+            renderer.colour = col;
+            renderer.Material.Texture = texture;
+            renderer.Material.TextureEnabled = true;
             BoxCollider collider = tile.AddComponent<BoxCollider>();
             BoundingBox bounds = new BoundingBox(-Vector3.One / 2f, Vector3.One / 2f);
             collider.UnScaledBounds = bounds;

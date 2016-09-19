@@ -5,16 +5,21 @@ using MonogameLearning.Utilities;
 using MazeEscape.Utilities;
 using Arrrive_Pursue_Behaviour.GameComponents;
 using Pathfinding.Pathfinding;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Pathfinding.GameComponents
 {
     class PlayerController : Component
     {
         public LevelGraph levelGraph;
+        //for debugging/visual purposes
         public GraphNode selectedNode, startNode;
-        public BreadthSearchPathing pathfinder;
-        public DijkstraPathing dPath;
-        public AStarPathing aPath;
+        public GraphNode[] debugPath;
+        public VertexPositionColor[] pathBuffer;
+        private Vector3[] pathPoints;
+        public int[] pathIndices;
+        //end debug variables
+        private AStarPathing aPath;
         private Raycast raycast;
         private GameObject lastClicked, currentClicked;
         private ArriveAtComponent mover;
@@ -32,8 +37,6 @@ namespace Pathfinding.GameComponents
                 mover.steerDuration = 0.25f;
                 mover.MinimumDistance = 0.25f;
             }
-            pathfinder = new BreadthSearchPathing(levelGraph);
-            dPath = new DijkstraPathing(levelGraph);
             aPath = new AStarPathing(levelGraph);
             currentPath = null;
         }
@@ -52,7 +55,11 @@ namespace Pathfinding.GameComponents
                     GraphNode clickedNode = levelGraph.getFromWorldPos(currentClicked.transform.Position);
                     GraphNode startNode = levelGraph.getFromWorldPos(owner.transform.Position);
                     currentPath = aPath.findPath(startNode, clickedNode);
-                    System.Console.WriteLine("Current path: " + (currentPath != null));
+                    if(currentPath != null)
+                    {
+                        System.Console.WriteLine("Found a path!");
+                        createPathDisplay();
+                    }
                 }
             }
             if(mover.Arrived)
@@ -61,7 +68,6 @@ namespace Pathfinding.GameComponents
                 //do we have a path?
                 if(currentPath != null)
                 {
-                    System.Console.WriteLine("Have a path.");
                     //are there any nodes left in the path?
                     if(currentPath.Count > 0)
                     {
@@ -117,6 +123,20 @@ namespace Pathfinding.GameComponents
                     else
                         renderer.Material.DiffuseColor = Color.Gray.ToVector3() * renderer.colour.ToVector3();
                 }
+            }
+        }
+
+        private void createPathDisplay()
+        {
+            debugPath = currentPath.ToArray();
+            pathBuffer = new VertexPositionColor[debugPath.Length];
+            pathIndices = new int[debugPath.Length];
+            for (int i = 0; i < debugPath.Length; i++)
+            {
+                Vector3 point = debugPath[i].position;
+                point.Y = 1.25f;
+                pathBuffer[i] = new VertexPositionColor(point, Color.White);
+                pathIndices[i] = i;
             }
         }
     }
