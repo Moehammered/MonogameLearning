@@ -20,11 +20,6 @@ namespace Pathfinding.Pathfinding
             nodeGraph = new List<GraphNode>(level.columns * level.rows);
         }
 
-        public List<GraphNode> NodeGraph
-        {
-            get { return nodeGraph; }
-        }
-
         public GraphNode getFromWorldPos(Vector3 pos)
         {
             int x = (int)Math.Round(pos.X);

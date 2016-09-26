@@ -152,8 +152,8 @@ namespace Pathfinding.Utilities
             GameObject cam = new GameObject(gameInstance);
 
             cam.AddComponent<Camera>();
-            cam.transform.Position = new Vector3(5, 20, 30);
-            cam.transform.lookAt(new Vector3(5, 0, 0));
+            cam.transform.Position = new Vector3(10, 25, 40);
+            cam.transform.lookAt(new Vector3(10, 0, 0));
             
             return cam;
         }

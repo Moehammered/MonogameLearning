@@ -16,7 +16,6 @@ namespace Pathfinding.GameComponents
         public GraphNode selectedNode, startNode;
         public GraphNode[] debugPath;
         public VertexPositionColor[] pathBuffer;
-        private Vector3[] pathPoints;
         public int[] pathIndices;
         //end debug variables
         private AStarPathing aPath;

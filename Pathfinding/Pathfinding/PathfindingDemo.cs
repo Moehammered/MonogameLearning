@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using MonogameLearning.BaseComponents;
 using MonogameLearning.Graphics;
 using MonogameLearning.Utilities;
+using Pathfinding.BaseComponents;
 using Pathfinding.GameComponents;
 using Pathfinding.Pathfinding;
 using Pathfinding.Utilities;
@@ -25,6 +26,7 @@ namespace Pathfinding
         private LevelBuilder levelBuilder;
         private LevelGraph levelGraph;
         private GameObject playerCube;
+        private GameObject pathLine;
         private PlayerController player;
         private SpriteFont font;
         private Time timer;
@@ -71,6 +73,9 @@ namespace Pathfinding
             playerCube.transform.Position = Vector3.One;
             player = playerCube.AddComponent<PlayerController>();
             player.levelGraph = levelGraph;
+
+            pathLine = new GameObject(this);
+            pathLine.AddComponent<LineRenderer>();
 
             base.Initialize();
         }

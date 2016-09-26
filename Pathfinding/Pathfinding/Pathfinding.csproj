@@ -41,6 +41,7 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BaseComponents\LineRenderer.cs" />
     <Compile Include="GameComponents\PlayerController.cs" />
     <Compile Include="Pathfinding\AStarPathing.cs" />
     <Compile Include="Pathfinding\BreadthSearchPathing.cs" />
