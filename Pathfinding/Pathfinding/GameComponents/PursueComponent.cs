@@ -1,9 +1,4 @@
 ﻿using MonogameLearning.BaseComponents;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using MonogameLearning.GameComponents;
 using MonogameLearning.Utilities;
@@ -96,14 +91,12 @@ namespace Arrrive_Pursue_Behaviour.GameComponents
 
         private void OnCollision()
         {
-            //Console.WriteLine("Pursue Collided");
             currentSpeed = 0;
             arrived = true;
         }
 
         private void OnCollisionExit()
         {
-            //Console.WriteLine("Pursue not colliding!");
             //start a cooldown to let the pursuer chase again
             pursueCooldown = 1;
         }

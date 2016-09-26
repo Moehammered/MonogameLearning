@@ -6,17 +6,14 @@ namespace MonogameLearning.BaseComponents
     {
         public ColliderComponent() : base()
         {
-
         }
 
         public override void Initialize()
         {
-
         }
 
         public override void Update(GameTime gameTime)
         {
-
         }
     }
 }

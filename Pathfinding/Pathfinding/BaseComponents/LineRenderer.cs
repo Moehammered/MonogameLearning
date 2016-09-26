@@ -1,9 +1,4 @@
 ﻿using MonogameLearning.BaseComponents;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -20,9 +15,6 @@ namespace Pathfinding.BaseComponents
 
         public LineRenderer() : base()
         {
-            material = new BasicEffect(GraphicsDevice);
-            material.VertexColorEnabled = true;
-            material.DiffuseColor = Color.White.ToVector3();
         }
 
         public Color Colour
@@ -88,6 +80,9 @@ namespace Pathfinding.BaseComponents
 
         public override void Initialize()
         {
+            material = new BasicEffect(GraphicsDevice);
+            material.VertexColorEnabled = true;
+            material.DiffuseColor = Color.White.ToVector3();
         }
 
         public override void Update(GameTime gameTime)
@@ -108,7 +103,7 @@ namespace Pathfinding.BaseComponents
                 foreach(EffectPass pass in material.CurrentTechnique.Passes)
                 {
                     pass.Apply();
-                    GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.LineList, 0, 0, indices.Length - 1);
+                    GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.LineStrip, 0, 0, indices.Length - 1);
                 }
             }
         }

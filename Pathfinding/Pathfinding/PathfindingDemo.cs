@@ -5,11 +5,9 @@ using Microsoft.Xna.Framework.Input;
 using MonogameLearning.BaseComponents;
 using MonogameLearning.Graphics;
 using MonogameLearning.Utilities;
-using Pathfinding.BaseComponents;
 using Pathfinding.GameComponents;
 using Pathfinding.Pathfinding;
 using Pathfinding.Utilities;
-using System.Collections.Generic;
 
 namespace Pathfinding
 {
@@ -18,31 +16,37 @@ namespace Pathfinding
     /// </summary>
     public class PathfindingDemo : Game
     {
+        #region Window Properties
         private string windowTitle = "Pathfinding";
         private int windowWidth = 1280, windowHeight = 720;
+        #endregion
+        #region Utility Properties
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         private CollisionDetector collisionService;
+        private Time timer;
+        #endregion
+        #region Game Properties
         private LevelBuilder levelBuilder;
         private LevelGraph levelGraph;
         private GameObject playerCube;
-        private GameObject pathLine;
-        private PlayerController player;
+        #endregion
+        #region Path Display Properties
+        private PathRenderComponent pathDisplay;
         private SpriteFont font;
-        private Time timer;
-        private BasicEffect lineMaterial;
+        #endregion
 
         public PathfindingDemo()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            #region Window Setup
             this.Window.Title = windowTitle;
             IsMouseVisible = true;
             graphics.PreferredBackBufferWidth = windowWidth;
             graphics.PreferredBackBufferHeight = windowHeight;
             graphics.ApplyChanges();
-
-            levelBuilder = new LevelBuilder(this);
+            #endregion
         }
 
         /// <summary>
@@ -53,29 +57,36 @@ namespace Pathfinding
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            #region Utility Setup
             timer = Time.Instance;
-            lineMaterial = new BasicEffect(GraphicsDevice);
             collisionService = new CollisionDetector();
             Services.AddService<CollisionDetector>(collisionService);
-            
+            #endregion
+
+            #region Level Setup
+            //construct level gameobjects
+            levelBuilder = new LevelBuilder(this);
             levelBuilder.initialise();
             levelBuilder.loadLevel("level2.txt");
             levelBuilder.buildLevel();
 
+            //construct the levelgraph for pathfinding
             levelGraph = new LevelGraph(levelBuilder.LoadedLevelData);
             levelGraph.buildGraph();
+            #endregion
 
+            #region Player Setup
+            //setup the player gameobject to have pathfinding and display capabilities
             playerCube = new GameObject(this);
             MeshRendererComponent cubeRend = playerCube.AddComponent<MeshRendererComponent>();
             cubeRend.Mesh = PrimitiveShape.CreateCube();
             cubeRend.colour = Color.Purple;
             playerCube.transform.Position = Vector3.One;
-            player = playerCube.AddComponent<PlayerController>();
-            player.levelGraph = levelGraph;
-
-            pathLine = new GameObject(this);
-            pathLine.AddComponent<LineRenderer>();
+            playerCube.AddComponent<PlayerController>();
+            PathfinderComponent playerPathSearch = playerCube.AddComponent<PathfinderComponent>();
+            playerPathSearch.setAlgorithm<AStarPathing>(levelGraph);
+            pathDisplay = playerCube.AddComponent<PathRenderComponent>();
+            #endregion
 
             base.Initialize();
         }
@@ -86,9 +97,7 @@ namespace Pathfinding
         /// </summary>
         protected override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            // TODO: use this.Content to load your game content here
             font = Content.Load<SpriteFont>("Arial");
         }
 
@@ -98,7 +107,6 @@ namespace Pathfinding
         /// </summary>
         protected override void UnloadContent()
         {
-            // TODO: Unload any non ContentManager content here
         }
 
         /// <summary>
@@ -111,10 +119,11 @@ namespace Pathfinding
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            //main game service updates
             timer.tick(ref gameTime);
-            // TODO: Add your update logic here
             collisionService.sweepDynamics();
 
+            //update all game components
             base.Update(gameTime);
             Input.recordInputs();
         }
@@ -126,18 +135,15 @@ namespace Pathfinding
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            // TODO: Add your drawing code here
-
+            
             base.Draw(gameTime);
-            renderPathLines();
             renderHUD();
         }
 
+        #region Information Display Functions
         private void renderHUD()
         {
             spriteBatch.Begin();
-            displayClickedInfo();
             displayPathInfo();
             spriteBatch.End();
             GraphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
@@ -145,52 +151,12 @@ namespace Pathfinding
 
         private void displayPathInfo()
         {
-            if (player.debugPath != null)
+            if (pathDisplay != null)
             {
-                string message = "Current path\n";
-                for(int i = 0; i < player.debugPath.Length; i++)
-                {
-                    message += "Point[" + i + "]: " + player.debugPath[i].position + "\n";
-                }
-                spriteBatch.DrawString(font, message, new Vector2(windowWidth*0.75f, 0), Color.White);
+                spriteBatch.DrawString(font, pathDisplay.PathInfo, Vector2.Zero, Color.White);
+                spriteBatch.DrawString(font, pathDisplay.PointInfo, new Vector2(windowWidth*0.75f, 0), Color.White);
             }
         }
-
-        private void renderPathLines()
-        {
-            if(player.debugPath != null)
-            {
-                lineMaterial.World = Camera.mainCamera.World;
-                lineMaterial.View = Camera.mainCamera.View;
-                lineMaterial.Projection = Camera.mainCamera.Projection;
-
-                foreach (EffectPass pass in lineMaterial.CurrentTechnique.Passes)
-                {
-                    pass.Apply();
-                    GraphicsDevice.DrawUserIndexedPrimitives<VertexPositionColor>(
-                        PrimitiveType.LineStrip, player.pathBuffer, 0, player.pathBuffer.Length,
-                        player.pathIndices, 0, player.pathIndices.Length - 1);
-                }
-            }
-        }
-
-        private void displayClickedInfo()
-        {
-            Vector2 node;
-            string message = "Start Node: ";
-            if (player.selectedNode != null && player.startNode != null)
-            {
-                node = new Vector2(player.startNode.position.X, player.startNode.position.Z);
-                message += node;
-                node.X = player.selectedNode.position.X;
-                node.Y = player.selectedNode.position.Z;
-                message += "\nSelected Node: " + node;
-                List<GraphNode> nb = player.selectedNode.getNeightbours();
-                message += "\nSelected Node Neighbours: " + nb.Count;
-                foreach (GraphNode n in nb)
-                    message += "\nNeighbour: " + n.position + " Cost: " + n.TravelCost;
-            }
-            spriteBatch.DrawString(font, message, Vector2.Zero, Color.White);
-        }
+        #endregion
     }
 }

@@ -3,18 +3,16 @@ using System.Collections.Generic;
 
 namespace Pathfinding.Pathfinding
 {
-    class BreadthSearchPathing
+    class BreadthSearchPathing : GraphPath
     {
-        private LevelGraph graph;
         private Queue<GraphNode> processQueue;
 
-        public BreadthSearchPathing(LevelGraph graph)
+        public BreadthSearchPathing(LevelGraph graph) : base(graph)
         {
-            this.graph = graph;
             processQueue = new Queue<GraphNode>();
         }
 
-        public Stack<GraphNode> findPath(GraphNode start, GraphNode end)
+        public override Stack<GraphNode> findPath(GraphNode start, GraphNode end)
         {
             //reset the levelGraph
             graph.resetGraph();
@@ -57,7 +55,7 @@ namespace Pathfinding.Pathfinding
             return null;
         }
 
-        private Stack<GraphNode> reconstructPath(GraphNode endNode)
+        protected override Stack<GraphNode> reconstructPath(GraphNode endNode)
         {
             Stack<GraphNode> path = new Stack<GraphNode>();
             GraphNode current = endNode;

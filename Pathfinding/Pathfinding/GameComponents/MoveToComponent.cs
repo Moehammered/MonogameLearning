@@ -70,7 +70,6 @@ namespace MonogameLearning.GameComponents
 
         public override void Initialize()
         {
-            
         }
 
         public override void Update(GameTime gameTime)
@@ -78,7 +77,6 @@ namespace MonogameLearning.GameComponents
             if(!arrived)
             {
                 move();
-                
                 checkForArrival();
             }
         }

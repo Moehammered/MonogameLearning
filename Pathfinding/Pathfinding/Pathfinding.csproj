@@ -47,7 +47,10 @@
     <Compile Include="Pathfinding\BreadthSearchPathing.cs" />
     <Compile Include="Pathfinding\DijkstraPathing.cs" />
     <Compile Include="Pathfinding\GraphNode.cs" />
+    <Compile Include="Pathfinding\GraphPath.cs" />
     <Compile Include="Pathfinding\LevelGraph.cs" />
+    <Compile Include="Pathfinding\PathfinderComponent.cs" />
+    <Compile Include="Pathfinding\PathRenderComponent.cs" />
     <Compile Include="Utilities\FileLoader.cs" />
     <Compile Include="GameComponents\ArriveAtComponent.cs" />
     <Compile Include="BaseComponents\BoxCollider.cs" />

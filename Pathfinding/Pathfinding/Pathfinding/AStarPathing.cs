@@ -1,24 +1,19 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pathfinding.Pathfinding
 {
-    class AStarPathing
+    class AStarPathing : GraphPath
     {
-        private LevelGraph graph;
         private List<GraphNode> processQueue;
 
-        public AStarPathing(LevelGraph graph)
+        public AStarPathing(LevelGraph graph) : base(graph)
         {
-            this.graph = graph;
             processQueue = new List<GraphNode>();
         }
 
-        public Stack<GraphNode> findPath(GraphNode start, GraphNode end)
+        public override Stack<GraphNode> findPath(GraphNode start, GraphNode end)
         {
             graph.resetGraph();
             start.seen = true;
@@ -78,7 +73,7 @@ namespace Pathfinding.Pathfinding
             return gradient.LengthSquared();
         }
 
-        private Stack<GraphNode> reconstructPath(GraphNode endNode)
+        protected override Stack<GraphNode> reconstructPath(GraphNode endNode)
         {
             Stack<GraphNode> path = new Stack<GraphNode>();
             GraphNode current = endNode;

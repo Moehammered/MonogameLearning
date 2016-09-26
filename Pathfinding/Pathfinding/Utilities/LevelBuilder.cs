@@ -37,16 +37,6 @@ namespace Pathfinding.Utilities
 
         public void loadLevel(string name)
         {
-            /*if(loader.loadLevel(name, out level))
-            {
-                //construct objects now
-                readLevelData();
-            }
-            else
-            {
-                //construct a red cube at 0, 0, 0 for error
-                scene.Add(constructLevelObject(-1, Vector3.Zero));
-            }*/
             loadSuccessful = loader.loadLevel(name, out level);
         }
 
