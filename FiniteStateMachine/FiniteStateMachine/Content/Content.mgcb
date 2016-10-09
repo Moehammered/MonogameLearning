@@ -28,3 +28,6 @@
 /processorParam:TextureFormat=Compressed
 /build:Arial.spritefont
 
+#begin fsm_npc1.xml
+/copy:fsm_npc1.xml
+

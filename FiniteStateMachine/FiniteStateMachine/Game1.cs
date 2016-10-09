@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using FiniteStateMachine.FSM;
+using FiniteStateMachine.GameComponents;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonogameLearning.BaseComponents;
@@ -12,7 +14,7 @@ namespace FiniteStateMachine
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class Game1 : Game
+    public class FiniteStateMachineDemo : Game
     {
         #region Window Properties
         private string windowTitle = "Finite State Machine - AI";
@@ -21,6 +23,7 @@ namespace FiniteStateMachine
         #region Utility Properties
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
+        private FSMInterpreter fsmParses;
         private CollisionDetector collisionService;
         private Time timer;
         #endregion
@@ -28,13 +31,14 @@ namespace FiniteStateMachine
         private LevelBuilder levelBuilder;
         private LevelGraph levelGraph;
         private GameObject playerCube;
+        private GameObject NPCCube;
         #endregion
         #region Path Display Properties
         private PathRenderComponent pathDisplay;
         private SpriteFont font;
         #endregion
 
-        public Game1()
+        public FiniteStateMachineDemo()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -74,6 +78,7 @@ namespace FiniteStateMachine
             #region Player Setup
             //setup the player gameobject to have pathfinding and display capabilities
             playerCube = new GameObject(this);
+            playerCube.name = "Player";
             MeshRendererComponent cubeRend = playerCube.AddComponent<MeshRendererComponent>();
             cubeRend.Mesh = PrimitiveShape.CreateCube();
             cubeRend.colour = Color.Purple;
@@ -82,7 +87,23 @@ namespace FiniteStateMachine
             PathfinderComponent playerPathSearch = playerCube.AddComponent<PathfinderComponent>();
             playerPathSearch.setAlgorithm<AStarPathing>(levelGraph);
             pathDisplay = playerCube.AddComponent<PathRenderComponent>();
+            pathDisplay.colour = Color.Purple;
             #endregion
+            #region NPC Setup
+            NPCCube = new GameObject(this);
+            NPCCube.name = "NPC";
+            MeshRendererComponent npcRend = NPCCube.AddComponent<MeshRendererComponent>();
+            npcRend.Mesh = PrimitiveShape.CreateCube();
+            npcRend.colour = Color.DarkOrange;
+            NPCCube.transform.Position = new Vector3(10, 1, 10);
+            PathfinderComponent npcPathSearch = NPCCube.AddComponent<PathfinderComponent>();
+            npcPathSearch.setAlgorithm<AStarPathing>(levelGraph);
+            NPCCube.AddComponent<PathRenderComponent>().colour = Color.DarkOrange;
+            NPCCube.AddComponent<NPCController>();
+            NPCCube.AddComponent<FSMComponent>();
+            #endregion
+            fsmParses = new FSMInterpreter("fsm_npc1.xml");
+            fsmParses.parseFile();
             base.Initialize();
         }
 

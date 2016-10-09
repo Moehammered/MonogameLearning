@@ -20,6 +20,12 @@ namespace MonogameLearning.Pathfinding
             nodeGraph = new List<GraphNode>(level.columns * level.rows);
         }
 
+        public GraphNode getRandomNode()
+        {
+            Random rand = new Random();
+            return nodeGraph[rand.Next(0, nodeGraph.Count)];
+        }
+
         public GraphNode getFromWorldPos(Vector3 pos)
         {
             int x = (int)Math.Round(pos.X);

@@ -16,6 +16,8 @@ namespace MonogameLearning.Pathfinding
         public override Stack<GraphNode> findPath(GraphNode start, GraphNode end)
         {
             graph.resetGraph();
+            if (start == null || end == null)
+                return null;
             start.seen = true;
             processQueue.Add(start);
             float costSoFar = 0;

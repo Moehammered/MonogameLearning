@@ -20,6 +20,11 @@ namespace MonogameLearning.Pathfinding
             get { return currentPath; }
         }
 
+        public GraphNode RandomNode
+        {
+            get { return graph.getRandomNode(); }
+        }
+
         public Stack<GraphNode> findPath(GraphNode start, GraphNode end)
         {
             currentPath = graphSearch.findPath(start, end);

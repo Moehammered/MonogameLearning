@@ -51,6 +51,8 @@ namespace MonogameLearning.Utilities
                         if (!collisionCached)
                         {
                             collisionCache.Add(colliders[k].GetHashCode());
+                            //can redefine how the callback is made by checking for implementation details in derived class
+                            //see:http://stackoverflow.com/questions/2932421/detect-if-a-method-was-overridden-using-reflection-c
                             dynamicColliders[i].Owner.BroadcastMessage("OnCollision", colliders[k].Owner);
                         }
                     }
