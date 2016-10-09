@@ -56,7 +56,7 @@ namespace MonogameLearning.GameComponents
             else
                 currentSpeed = speed;
 
-            owner.transform.Translate(owner.transform.Forward * currentSpeed * Time.Instance.DeltaTime);
+            owner.transform.Translate(owner.transform.Forward * currentSpeed * Time.DeltaTime);
         }
 
         private bool nearDistination()
@@ -72,7 +72,7 @@ namespace MonogameLearning.GameComponents
             Quaternion desiredRot, currentRot;
             currentRot = owner.transform.Rotation;
             desiredRot = Quaternion.Identity.LookRotation(Vector3.Forward, newDir, Vector3.Up);
-            owner.transform.Rotation = Quaternion.Lerp(currentRot, desiredRot, Time.Instance.DeltaTime/steerDuration);
+            owner.transform.Rotation = Quaternion.Lerp(currentRot, desiredRot, Time.DeltaTime/steerDuration);
         }
     }
 }

@@ -54,12 +54,14 @@ namespace MonogameLearning.Utilities
                             //can redefine how the callback is made by checking for implementation details in derived class
                             //see:http://stackoverflow.com/questions/2932421/detect-if-a-method-was-overridden-using-reflection-c
                             dynamicColliders[i].Owner.BroadcastMessage("OnCollision", colliders[k].Owner);
+                            colliders[k].Owner.BroadcastMessage("OnCollision", dynamicColliders[i].Owner);
                         }
                     }
                     else if(collisionCached)
                     {
                         collisionCache.Remove(colliders[k].GetHashCode());
                         dynamicColliders[i].Owner.BroadcastMessage("OnCollisionExit");
+                        colliders[k].Owner.BroadcastMessage("OnCollisionExit");
                     }
                 }
             }

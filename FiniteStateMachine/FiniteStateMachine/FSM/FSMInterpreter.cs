@@ -9,6 +9,7 @@ namespace FiniteStateMachine.FSM
     /// An interpreter class designed to 'compile' an xml file which contains the design of state machine definitions.
     /// This interpreter contains all machines it has parsed from the file, and can then be used to give an 'FSMComponent' a machine
     /// to work with. A machine will self contain the means necessary to perform it's sequence or operations.
+    /// A component is responsible for assigning delegates to the machine it owns.
     /// </summary>
     class FSMInterpreter
     {
@@ -19,6 +20,21 @@ namespace FiniteStateMachine.FSM
         {
             file = XElement.Load(Environment.CurrentDirectory + "/Content/" + filename);
             machines = new List<FiniteStateMachine>(1);
+        }
+
+        public FiniteStateMachine Machine
+        {
+            get
+            {
+                string index = file.Attribute("activeFSM").Value;
+                int parsedInd = Int32.Parse(index);
+                return machines[parsedInd];
+            }
+        }
+
+        public List<FiniteStateMachine> Machines
+        {
+            get { return machines; }
         }
 
         public void parseFile()

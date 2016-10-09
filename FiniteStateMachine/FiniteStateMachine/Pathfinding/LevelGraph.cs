@@ -30,7 +30,10 @@ namespace MonogameLearning.Pathfinding
         {
             int x = (int)Math.Round(pos.X);
             int z = (int)Math.Round(pos.Z);
-
+            while (x > gridNodes.GetLength(0) - 1)
+                x -= gridNodes.GetLength(0) - 1;
+            while (z > gridNodes.GetLength(1) - 1)
+                z -= gridNodes.GetLength(1) - 1;
             return gridNodes[x, z];
         }
 

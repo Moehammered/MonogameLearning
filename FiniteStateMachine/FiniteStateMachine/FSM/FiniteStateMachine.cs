@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace FiniteStateMachine.FSM
 {
@@ -6,7 +7,9 @@ namespace FiniteStateMachine.FSM
     {
         private string name;
         private string startState;
+        private string currStateName;
         private List<FiniteState> states;
+        private FiniteState currentState;
 
         public FiniteStateMachine(string name, string startState)
         {
@@ -15,9 +18,40 @@ namespace FiniteStateMachine.FSM
             states = new List<FiniteState>();
         }
 
+        public string CurrentState
+        {
+            get { return currStateName; }
+        }
+
+        public void initialiseMachine()
+        {
+            currentState = getState(startState);
+            currStateName = currentState.StateName;
+        }
+
+        public void processState()
+        {
+            if (currentState != null)
+            {
+                currentState.processState();
+                string nextState = "";
+                if (currentState.needsTransition(out nextState))
+                {
+                    currentState = getState(nextState);
+                    Console.WriteLine("Changing from: " + currStateName + " to: " + nextState);
+                    currStateName = nextState;
+                }
+            }
+        }
+
         public string StartState
         {
             get { return startState; }
+        }
+
+        public List<FiniteState> States
+        {
+            get { return states; }
         }
 
         public FiniteState getState(string name)

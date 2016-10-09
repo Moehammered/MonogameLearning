@@ -8,6 +8,7 @@ namespace MonogameLearning.GameComponents
 {
     class PlayerController : Component
     {
+        public bool isPoweredUp = false;
         private Raycast raycast;
         private GameObject lastClicked, currentClicked;
         private PathfinderComponent pathComponent;
@@ -37,18 +38,32 @@ namespace MonogameLearning.GameComponents
 
         public override void Update(GameTime gameTime)
         {
-            if(Input.IsMousePressed(MouseButton.LEFT))
+            if (this.enabled)
             {
-                //find what we clicked on
-                setClickedObject(findClickedObject());
+                if (Input.IsMousePressed(MouseButton.LEFT))
+                {
+                    //find what we clicked on
+                    setClickedObject(findClickedObject());
+                }
+                else if (Input.IsMouseReleased(MouseButton.LEFT))
+                {
+                    mover.abortMovement();
+                    updatePath();
+                }
+                if (mover.Arrived)
+                {
+                    updateDestination();
+                }
             }
-            else if(Input.IsMouseReleased(MouseButton.LEFT))
+            else
+                Owner.Destroy();
+        }
+
+        public void OnCollision(GameObject col)
+        {
+            if(col.name == "NPC" && !isPoweredUp)
             {
-                updatePath();
-            }
-            if(mover.Arrived)
-            {
-                updateDestination();
+                this.enabled = false;
             }
         }
 
@@ -104,13 +119,13 @@ namespace MonogameLearning.GameComponents
             {
                 if (currentPath.Count > 0) //are there any nodes left in the path?
                 {
-                    System.Console.WriteLine("Nodes still on path: " + currentPath.Count);
+                    //System.Console.WriteLine("Nodes still on path: " + currentPath.Count);
                     //make the next node the destination
                     GraphNode next = currentPath.Pop();
                     Vector3 nextPos = next.position;
                     nextPos.Y = owner.transform.Position.Y;
                     mover.Destination = nextPos;
-                    System.Console.WriteLine("Moving to: " + nextPos);
+                    //System.Console.WriteLine("Moving to: " + nextPos);
                 }
             }
         }

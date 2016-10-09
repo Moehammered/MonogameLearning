@@ -20,6 +20,14 @@ namespace MonogameLearning.BaseComponents
             name = "GameObject";
         }
 
+        public void Destroy()
+        {
+            for(int i = 0; i < components.Count; i++)
+            {
+                gameInstance.Components.Remove(components[i]);
+            }
+        }
+
         public T AddComponent<T>() where T : Component, new ()
         {
             //leaving this here to remember this class

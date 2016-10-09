@@ -1,8 +1,11 @@
-﻿namespace FiniteStateMachine.FSM
+﻿using System;
+
+namespace FiniteStateMachine.FSM
 {
     class StateTransition
     {
         private string target, condition;
+        private Func<bool> conditionEvaluator;
 
         public StateTransition(string target, string condition)
         {
@@ -10,9 +13,17 @@
             this.condition = condition;
         }
 
+        public Func<bool> ConditionExpression
+        {
+            set { conditionEvaluator = value; }
+        }
+
         public bool evaluateTransition()
         {
-            return false;
+            if (conditionEvaluator != null)
+                return conditionEvaluator.Invoke();
+            else
+                return false;
         }
 
         public string TargetState

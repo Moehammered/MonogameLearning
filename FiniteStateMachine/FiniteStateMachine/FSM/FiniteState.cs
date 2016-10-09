@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace FiniteStateMachine.FSM
 {
@@ -6,11 +7,37 @@ namespace FiniteStateMachine.FSM
     {
         private string name;
         private List<StateTransition> transitions;
+        private Action task;
 
         public FiniteState(string name)
         {
             this.name = name;
             transitions = new List<StateTransition>();
+        }
+
+        public Action StateTask
+        {
+            set { task = value; }
+        }
+
+        public void processState()
+        {
+            if(task != null)
+                task.Invoke();
+        }
+
+        public bool needsTransition(out string nextState)
+        {
+            nextState = "";
+            foreach(StateTransition t in transitions)
+            {
+                if(t != null && t.evaluateTransition())
+                {
+                    nextState = t.TargetState;
+                    return true;
+                }
+            }
+            return false;
         }
 
         public string StateName

@@ -81,9 +81,14 @@ namespace MonogameLearning.GameComponents
             }
         }
 
+        public void abortMovement()
+        {
+            arrived = true;
+        }
+
         protected virtual void move()
         {
-            owner.transform.Translate(owner.transform.Forward * currentSpeed * Time.Instance.DeltaTime);
+            owner.transform.Translate(owner.transform.Forward * currentSpeed * Time.DeltaTime);
         }
 
         protected void checkForArrival()

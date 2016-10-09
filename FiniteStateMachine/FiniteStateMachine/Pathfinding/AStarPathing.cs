@@ -46,7 +46,7 @@ namespace MonogameLearning.Pathfinding
                         node.CostSoFar = node.TravelCost + costSoFar + hueristicDistance;
                         if (node == end)
                         {
-                            Console.WriteLine("Found a path!");
+                            //Console.WriteLine("Found a path!");
                             processQueue.Clear();
                             return reconstructPath(node);
                         }

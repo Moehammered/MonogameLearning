@@ -32,9 +32,12 @@ namespace FiniteStateMachine
         private LevelGraph levelGraph;
         private GameObject playerCube;
         private GameObject NPCCube;
+        private GameObject powerUpCube;
+        private NPCController npcController;
+        private PlayerController playerController;
         #endregion
         #region Path Display Properties
-        private PathRenderComponent pathDisplay;
+        private PathRenderComponent playerPathDisplay, npcPathDisplay;
         private SpriteFont font;
         #endregion
 
@@ -63,6 +66,9 @@ namespace FiniteStateMachine
             timer = Time.Instance;
             collisionService = new CollisionDetector();
             Services.AddService<CollisionDetector>(collisionService);
+            fsmParses = new FSMInterpreter("fsm_npc1.xml");
+            fsmParses.parseFile();
+            BoundingBox cubeBounds = new BoundingBox(-Vector3.One / 2f, Vector3.One / 2f);
             #endregion
             #region Level Setup
             //construct level gameobjects
@@ -83,11 +89,13 @@ namespace FiniteStateMachine
             cubeRend.Mesh = PrimitiveShape.CreateCube();
             cubeRend.colour = Color.Purple;
             playerCube.transform.Position = Vector3.One;
-            playerCube.AddComponent<PlayerController>();
+            playerController = playerCube.AddComponent<PlayerController>();
             PathfinderComponent playerPathSearch = playerCube.AddComponent<PathfinderComponent>();
             playerPathSearch.setAlgorithm<AStarPathing>(levelGraph);
-            pathDisplay = playerCube.AddComponent<PathRenderComponent>();
-            pathDisplay.colour = Color.Purple;
+            playerPathDisplay = playerCube.AddComponent<PathRenderComponent>();
+            playerPathDisplay.colour = Color.Purple;
+            BoxCollider playerCollider = playerCube.AddComponent<BoxCollider>();
+            playerCollider.UnScaledBounds = cubeBounds;
             #endregion
             #region NPC Setup
             NPCCube = new GameObject(this);
@@ -98,13 +106,31 @@ namespace FiniteStateMachine
             NPCCube.transform.Position = new Vector3(10, 1, 10);
             PathfinderComponent npcPathSearch = NPCCube.AddComponent<PathfinderComponent>();
             npcPathSearch.setAlgorithm<AStarPathing>(levelGraph);
-            NPCCube.AddComponent<PathRenderComponent>().colour = Color.DarkOrange;
-            NPCCube.AddComponent<NPCController>();
-            NPCCube.AddComponent<FSMComponent>();
+            npcPathDisplay = NPCCube.AddComponent<PathRenderComponent>();
+            npcPathDisplay.colour = Color.DarkOrange;
+            npcController = NPCCube.AddComponent<NPCController>();
+            npcController.player = playerCube.GetComponent<PlayerController>();
+            npcController.PlayerNearDistance = 4;
+            npcController.PlayerFarDistance = 8;
+            BoxCollider npcCollider = NPCCube.AddComponent<BoxCollider>();
+            npcCollider.UnScaledBounds = cubeBounds;
+            npcController.machine = fsmParses.Machine;
             #endregion
-            fsmParses = new FSMInterpreter("fsm_npc1.xml");
-            fsmParses.parseFile();
+            #region Powerup Setup
+            powerUpCube = new GameObject(this);
+            powerUpCube.name = "powerup";
+            MeshRendererComponent powerUpRend = powerUpCube.AddComponent<MeshRendererComponent>();
+            powerUpRend.Mesh = PrimitiveShape.CreateCube();
+            powerUpRend.colour = Color.Gold;
+            powerUpCube.transform.Scale = Vector3.One / 2f;
+            powerUpCube.transform.Position = new Vector3(5, 1, 5);
+            BoxCollider powerUpCollider = powerUpCube.AddComponent<BoxCollider>();
+            powerUpCollider.UnScaledBounds = cubeBounds;
+            powerUpCube.AddComponent<PowerUpPill>();
+            #endregion
+
             base.Initialize();
+            collisionService.addDynamicCollider(playerCollider);
         }
 
         /// <summary>
@@ -159,17 +185,29 @@ namespace FiniteStateMachine
         private void renderHUD()
         {
             spriteBatch.Begin();
-            displayPathInfo();
+            displayNPCInfo();
+            displayPlayerInfo();
             spriteBatch.End();
             GraphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
         }
 
-        private void displayPathInfo()
+        private void displayNPCInfo()
         {
-            if (pathDisplay != null)
+            if(npcPathDisplay != null)
             {
-                spriteBatch.DrawString(font, pathDisplay.PathInfo, Vector2.Zero, Color.White);
-                spriteBatch.DrawString(font, pathDisplay.PointInfo, new Vector2(windowWidth * 0.75f, 0), Color.White);
+                spriteBatch.DrawString(font, "AI: " + npcController.machine.CurrentState, (Vector2.UnitX * windowWidth * 0.7f), Color.White);
+                spriteBatch.DrawString(font, npcPathDisplay.PathInfo, (Vector2.UnitX * windowWidth * 0.7f) + (Vector2.UnitY * windowHeight * 0.05f), Color.White);
+                spriteBatch.DrawString(font, npcPathDisplay.PointInfo, (Vector2.UnitX * windowWidth * 0.7f) + (Vector2.UnitY * windowHeight * 0.1f), Color.White);
+            }
+        }
+
+        private void displayPlayerInfo()
+        {
+            if (playerPathDisplay != null)
+            {
+                spriteBatch.DrawString(font, "Player Powered? " + playerController.isPoweredUp, Vector2.Zero, Color.White);
+                spriteBatch.DrawString(font, playerPathDisplay.PathInfo, Vector2.UnitY * windowHeight * 0.025f, Color.White);
+                spriteBatch.DrawString(font, playerPathDisplay.PointInfo, Vector2.UnitY * windowHeight * 0.1f, Color.White);
             }
         }
         #endregion

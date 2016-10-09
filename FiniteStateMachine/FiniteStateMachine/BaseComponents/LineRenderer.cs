@@ -44,7 +44,7 @@ namespace MonogameLearning.BaseComponents
             set
             {
                 vertices = value;
-                if(vertices != null)
+                if(vertices != null && vertices.Length > 0)
                 {
                     updateVertexBuffer();
                     updateIndices(vertices.Length);
@@ -93,7 +93,7 @@ namespace MonogameLearning.BaseComponents
 
         public override void Draw(GameTime gameTime)
         {
-            if (buffer != null)
+            if (buffer != null && indices.Length > 1)
             {
                 GraphicsDevice.SetVertexBuffer(buffer);
                 GraphicsDevice.Indices = indexBuffer;

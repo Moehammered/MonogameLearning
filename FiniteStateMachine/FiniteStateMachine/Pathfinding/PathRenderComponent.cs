@@ -45,7 +45,7 @@ namespace MonogameLearning.Pathfinding
             {
                 if(currentPath != pathfinder.CurrentPath)
                 {
-                    System.Console.WriteLine("Updating path display.");
+                    //System.Console.WriteLine("Updating path display.");
                     updatePath();
                     updateDisplay();
                 }
@@ -72,14 +72,14 @@ namespace MonogameLearning.Pathfinding
         {
             if(renderer != null)
             {
-                renderer.Vertices = pathPoints;
+                 renderer.Vertices = pathPoints;
             }
             updatePathInformation();
         }
 
         private void updatePathInformation()
         {
-            if (pathPoints != null)
+            if (pathPoints != null && pathPoints.Length > 0)
             {
                 pathInfo = "Start Node: " + pathPoints[0];
                 pathInfo += "\nDestination Node: " + pathPoints[pathPoints.Length - 1];

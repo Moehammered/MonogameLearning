@@ -52,7 +52,7 @@ namespace MonogameLearning.GameComponents
         {
             if (mover != null)
             {
-                refreshTimer -= Time.Instance.DeltaTime;
+                refreshTimer -= Time.DeltaTime;
                 if (refreshTimer < 0)
                 {
                     getTargetTrajectory();
@@ -71,7 +71,7 @@ namespace MonogameLearning.GameComponents
             }
             else if(pursueCooldown > 0)
             {
-                pursueCooldown -= Time.Instance.DeltaTime;
+                pursueCooldown -= Time.DeltaTime;
                 if(pursueCooldown < 0)
                 {
                     arrived = false;

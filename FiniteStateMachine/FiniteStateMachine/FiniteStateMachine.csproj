@@ -45,8 +45,8 @@
     <Compile Include="FSM\FiniteStateMachine.cs" />
     <Compile Include="FSM\FSMInterpreter.cs" />
     <Compile Include="FSM\StateTransition.cs" />
-    <Compile Include="GameComponents\FSMComponent.cs" />
     <Compile Include="GameComponents\NPCController.cs" />
+    <Compile Include="GameComponents\PowerUpPill.cs" />
     <Compile Include="Utilities\BinarySerialiser.cs" />
     <Compile Include="Utilities\CollisionDetector.cs" />
     <Compile Include="Utilities\ExtensionUtilities.cs" />
