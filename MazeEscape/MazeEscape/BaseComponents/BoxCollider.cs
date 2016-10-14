@@ -12,7 +12,6 @@ namespace MonogameLearning.BaseComponents
         {
             unscaledBounds = new BoundingBox();
             scaledBounds = new BoundingBox();
-            
         }
 
         public override void Initialize()
@@ -49,7 +48,6 @@ namespace MonogameLearning.BaseComponents
 
         public override void Update(GameTime gameTime)
         {
-
         }
 
         public bool Intersects(BoundingBox box)

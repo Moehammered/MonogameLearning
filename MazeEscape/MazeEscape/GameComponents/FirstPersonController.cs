@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework;
 using MonogameLearning.BaseComponents;
 using Microsoft.Xna.Framework.Input;
-using MazeEscape.Utilities;
 using MonogameLearning.Utilities;
 using Microsoft.Xna.Framework.Audio;
 

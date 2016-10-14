@@ -4,13 +4,11 @@ namespace MonogameLearning.BaseComponents
 {
     class Camera : Component
     {
+        public static Camera mainCamera;
         //world seems to be becoming redundant - might be needed when transform component is made.
         private Matrix world, view, projection;
         private float FOV, aspect, near, far;
-        //private bool viewNeedsUpdate = false;
-
-        public static Camera mainCamera;
-
+        
         /// <summary>
         /// Setup a camera to have 45 degree field of view in perspective with widescreen aspect ratio.
         /// Positioned at the centre of the world.

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace MazeEscape.Utilities
+namespace MonogameLearning.Utilities
 {
     public enum MouseButton
     {

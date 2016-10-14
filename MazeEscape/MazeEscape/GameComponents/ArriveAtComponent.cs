@@ -2,7 +2,7 @@
 using MonogameLearning.GameComponents;
 using MonogameLearning.Utilities;
 
-namespace Arrrive_Pursue_Behaviour.GameComponents
+namespace MonogameLearning.GameComponents
 {
     class ArriveAtComponent : MoveToComponent
     {
@@ -44,6 +44,7 @@ namespace Arrrive_Pursue_Behaviour.GameComponents
                 arrived = false;
                 currentSpeed = speed;
                 startRot = owner.transform.Rotation;
+                checkForArrival();
             }
         }
 

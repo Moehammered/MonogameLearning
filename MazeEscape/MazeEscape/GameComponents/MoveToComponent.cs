@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using MonogameLearning.BaseComponents;
-using MonogameLearning.Graphics;
 using MonogameLearning.Utilities;
 
 namespace MonogameLearning.GameComponents
@@ -71,7 +70,6 @@ namespace MonogameLearning.GameComponents
 
         public override void Initialize()
         {
-            
         }
 
         public override void Update(GameTime gameTime)
@@ -79,9 +77,13 @@ namespace MonogameLearning.GameComponents
             if(!arrived)
             {
                 move();
-                
                 checkForArrival();
             }
+        }
+
+        public void abortMovement()
+        {
+            arrived = true;
         }
 
         protected virtual void move()

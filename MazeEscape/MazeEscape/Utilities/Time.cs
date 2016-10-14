@@ -25,30 +25,20 @@ namespace MonogameLearning.Utilities
                 return instance;
             }
         }
-
+        
         public static float DeltaTime
         {
-            get { return Instance.deltaTime; }
+            get
+            {
+                return Instance.deltaTime;
+            }
         }
 
         public static float TotalTime
         {
-            get { return Instance.currentTime; }
-        }
-
-        public float InstanceDeltaTime
-        {
             get
             {
-                return deltaTime;
-            }
-        }
-
-        public float InstanceTotalTime
-        {
-            get
-            {
-                return currentTime;
+                return instance.currentTime;
             }
         }
 

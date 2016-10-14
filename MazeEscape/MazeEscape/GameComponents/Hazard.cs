@@ -1,6 +1,6 @@
 ﻿using MonogameLearning.BaseComponents;
 using Microsoft.Xna.Framework;
-using Arrrive_Pursue_Behaviour.GameComponents;
+using MonogameLearning.GameComponents;
 
 namespace MazeEscape.GameComponents
 {

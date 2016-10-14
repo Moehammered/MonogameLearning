@@ -1,0 +1,46 @@
+﻿<!---
+activeFSM property will decide which fsm to give the npc
+
+Allowed states:
+- IDLE
+- PURSUE
+- EVADE
+
+Allowed conditions:
+- ALWAYSTRUE (this implements sequences)
+- PLAYER_POWERUPPILL
+- PLAYER_POWERUPPILL_EXPIRE
+- PLAYER_NEAR
+- PLAYER_FAR
+-->
+
+<machines name="AI_Machines" activeFSM="1">
+	<fsm name="npc1" startState="IDLE">
+	  <state name="IDLE">
+		<transition condition="PLAYER_NEAR" toState="PURSUE" />
+	  </state>
+	  
+	  <state name="PURSUE">
+		<transition condition="PLAYER_FAR" toState="IDLE" />
+		<transition condition="PLAYER_POWERUPPILL" toState="EVADE" />
+	  </state>
+	  
+	  <state name="EVADE">
+		<transition condition="PLAYER_FAR" toState="IDLE" />
+	  </state>
+	</fsm>
+	<fsm name="npc2" startState="PURSUE">
+	  <state name="IDLE">
+		<transition condition="ALWAYSTRUE" toState="PURSUE" />
+	  </state>
+	  
+	  <state name="PURSUE">
+		<transition condition="PLAYER_POWERUPPILL" toState="EVADE" />
+	  </state>
+	  
+	  <state name="EVADE">
+		<transition condition="PLAYER_FAR" toState="IDLE" />
+	  </state>
+	</fsm>
+</machines>
+

@@ -1,18 +1,14 @@
 ﻿using MonogameLearning.BaseComponents;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using MonogameLearning.GameComponents;
 using MonogameLearning.Utilities;
 
-namespace Arrrive_Pursue_Behaviour.GameComponents
+namespace MonogameLearning.GameComponents
 {
     class PursueComponent : ArriveAtComponent
     {
         private GameObject pursueTarget;
+        private MoveToComponent mover;
         private float refreshRate, refreshTimer, pursueCooldown;
 
         public PursueComponent() : base()
@@ -39,7 +35,11 @@ namespace Arrrive_Pursue_Behaviour.GameComponents
                 pursueTarget = value;
                 if(pursueTarget != null)
                 {
-                    getTargetTrajectory();
+                    mover = pursueTarget.GetComponent<MoveToComponent>();
+                    if(mover != null)
+                    {
+                        getTargetTrajectory();
+                    }
                 }
             }
         }
@@ -50,7 +50,7 @@ namespace Arrrive_Pursue_Behaviour.GameComponents
 
         protected override void move()
         {
-            if (pursueTarget != null)
+            if (mover != null)
             {
                 refreshTimer -= Time.DeltaTime;
                 if (refreshTimer < 0)
@@ -82,24 +82,21 @@ namespace Arrrive_Pursue_Behaviour.GameComponents
 
         private void getTargetTrajectory()
         {
-            Vector3 targetDir = pursueTarget.transform.Forward;
-            targetDir.Y = 0;
-            float targetSpeed = 0.1f;
-            Vector3 gradient = pursueTarget.transform.Position - owner.transform.Position;
+            Vector3 targetDir = mover.Owner.transform.Forward;
+            float targetSpeed = mover.CurrentSpeed;
+            Vector3 gradient = mover.Owner.transform.Position - owner.transform.Position;
             float timeToTarget = gradient.Length() / (currentSpeed + 0.01f); //+0.01f so there is no divide by 0 when pursuer stops
-            Destination = pursueTarget.transform.Position + (targetDir * targetSpeed) * timeToTarget;
+            Destination = mover.Owner.transform.Position + (targetDir * targetSpeed) * timeToTarget;
         }
 
         private void OnCollision()
         {
-            //Console.WriteLine("Pursue Collided");
             currentSpeed = 0;
             arrived = true;
         }
 
         private void OnCollisionExit()
         {
-            //Console.WriteLine("Pursue not colliding!");
             //start a cooldown to let the pursuer chase again
             pursueCooldown = 1;
         }

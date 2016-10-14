@@ -1,7 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
-namespace MazeEscape.Utilities
+namespace MonogameLearning.Utilities
 {
     class FileLoader
     {
@@ -15,7 +14,7 @@ namespace MazeEscape.Utilities
             {
                 return File.ReadAllBytes(path);
             }
-            catch(FileNotFoundException exc)
+            catch(FileNotFoundException)
             {
                 return null;
             }
@@ -27,7 +26,7 @@ namespace MazeEscape.Utilities
             {
                 return File.ReadAllText(path);
             }
-            catch(FileNotFoundException exc)
+            catch(FileNotFoundException)
             {
                 return string.Empty;
             }
@@ -39,7 +38,7 @@ namespace MazeEscape.Utilities
             {
                 return File.ReadAllLines(path);
             }
-            catch(FileNotFoundException exc)
+            catch(FileNotFoundException)
             {
                 return null;
             }

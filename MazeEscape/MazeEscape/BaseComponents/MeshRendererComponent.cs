@@ -7,7 +7,6 @@ namespace MonogameLearning.BaseComponents
     class MeshRendererComponent : RenderComponent
     {
         public Color colour;
-
         protected VertexBuffer buffer;
         protected IndexBuffer indexBuffer;
         protected StaticMesh mesh;
@@ -16,40 +15,6 @@ namespace MonogameLearning.BaseComponents
         public MeshRendererComponent() : base()
         {
             colour = Color.White;
-        }
-
-        public override void Initialize()
-        {
-            material = new BasicEffect(GraphicsDevice);
-            material.VertexColorEnabled = true;
-            material.DiffuseColor = colour.ToVector3();
-
-            //base.Initialize();
-        }
-
-        public override void Draw(GameTime gameTime)
-        {
-            if(mesh != null)
-            {
-                GraphicsDevice.SetVertexBuffer(buffer);
-                GraphicsDevice.Indices = indexBuffer;
-                material.World = Matrix.CreateScale(owner.transform.Scale)
-                    * Matrix.CreateFromQuaternion(owner.transform.Rotation) 
-                    * Matrix.CreateTranslation(owner.transform.Position);
-                material.View = Camera.mainCamera.View;
-                material.Projection = Camera.mainCamera.Projection;
-                foreach (EffectPass pass in material.CurrentTechnique.Passes)
-                {
-                    pass.Apply();
-                    GraphicsDevice.DrawIndexedPrimitives(mesh.TriangleType, 0, 0, mesh.TriangleCount);
-                }
-            }
-            //base.Draw(gameTime);
-        }
-
-        public override void Update(GameTime gameTime)
-        {
-            //does nothing, might reconsider inheritance hierarchy
         }
 
         public StaticMesh Mesh
@@ -74,6 +39,36 @@ namespace MonogameLearning.BaseComponents
         {
             get { return material; }
             set { if (value != null) material = value; }
+        }
+
+        public override void Initialize()
+        {
+            material = new BasicEffect(GraphicsDevice);
+            material.VertexColorEnabled = true;
+            material.DiffuseColor = colour.ToVector3();
+        }
+
+        public override void Draw(GameTime gameTime)
+        {
+            if(mesh != null)
+            {
+                GraphicsDevice.SetVertexBuffer(buffer);
+                GraphicsDevice.Indices = indexBuffer;
+                material.World = Matrix.CreateScale(owner.transform.Scale)
+                    * Matrix.CreateFromQuaternion(owner.transform.Rotation) 
+                    * Matrix.CreateTranslation(owner.transform.Position);
+                material.View = Camera.mainCamera.View;
+                material.Projection = Camera.mainCamera.Projection;
+                foreach (EffectPass pass in material.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    GraphicsDevice.DrawIndexedPrimitives(mesh.TriangleType, 0, 0, mesh.TriangleCount);
+                }
+            }
+        }
+
+        public override void Update(GameTime gameTime)
+        {
         }
     }
 }

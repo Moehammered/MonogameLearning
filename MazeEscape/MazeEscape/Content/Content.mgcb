@@ -43,3 +43,15 @@
 /processorParam:Quality=Best
 /build:Sounds/win.wav
 
+#begin Levels/Level0.txt
+/copy:Levels/Level0.txt
+
+#begin Levels/Level1.txt
+/copy:Levels/Level1.txt
+
+#begin Levels/Level2.txt
+/copy:Levels/Level2.txt
+
+#begin fsm_npc1.xml
+/copy:fsm_npc1.xml
+

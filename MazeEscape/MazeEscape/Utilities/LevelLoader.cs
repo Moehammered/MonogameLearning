@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace MazeEscape.GameUtilities
+namespace MonogameLearning.GameUtilities
 {
     struct LevelData
     {
@@ -51,7 +51,7 @@ namespace MazeEscape.GameUtilities
                 levels = dir.GetFiles();
                 Console.WriteLine("Levels found: " + levels.Length);
             }
-            catch(DirectoryNotFoundException exc)
+            catch(DirectoryNotFoundException)
             {
                 levels = new FileInfo[0];
             }
