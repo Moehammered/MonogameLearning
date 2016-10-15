@@ -22,20 +22,16 @@ namespace MazeEscape.GameUtilities
     class MazeScene : Scene
     {
         private LevelLoader loader;
+        private LevelBuilder builder;
         private bool active;
         private int levelNumber;
-        //all things which could be chosen at random if more than 1 available
-        private List<Vector3> startPoints;
-        private List<Vector3> goalPoints;
-        //all things which will be spawned sequentially
-        private Stack<Vector3> enemyPoints;
-        private Stack<Vector3> collectablePoints;
 
         public MazeScene(Game instance, int levelNumber) : base(instance)
         {
             loader = new LevelLoader();
             loader.loadLevelFiles();
-            
+            builder = new LevelBuilder(GameInstance, this);
+
             active = false;
             if (levelNumber < 0)
                 levelNumber = 0;
@@ -74,7 +70,7 @@ namespace MazeEscape.GameUtilities
             if (loader.loadLevel("Level" + levelNumber + ".txt", out level))
             {
                 //found level successfully
-                createLevelTiles(level);
+                builder.createLevelTiles(level);
                 createPlayer();
                 createGoal();
                 createEnemies();
@@ -86,106 +82,7 @@ namespace MazeEscape.GameUtilities
                 //or display error message on screen
             }
         }
-
-        #region Level Tile Creation/Parsing
-        private void createLevelTiles(LevelData level)
-        {
-            Vector3 tilePosition = Vector3.Zero;
-            Color tileColour = Color.White;
-            Vector3 tileScale;
-            BoundingBox tileBounds = new BoundingBox(-Vector3.One / 2f, Vector3.One / 2f);
-            for(int x = 0; x < level.columns; x++)
-            {
-                tilePosition.X = x;
-                for(int z = 0; z < level.rows; z++)
-                {
-                    tilePosition.Z = z;
-                    tileScale = Vector3.One;
-                    int tileID = level.getData(x, z);
-                    parseTileData(tileID, tilePosition, ref tileColour, ref tileScale);
-                    createTile(tilePosition, tileScale, tileColour, tileBounds);
-                }
-            }
-        }
-
-        private void createTile(Vector3 position, Vector3 scale, Color colour, BoundingBox bounds)
-        {
-            GameObject tile = new GameObject(GameInstance);
-            tile.transform.Position = position;
-            tile.transform.Scale = scale;
-
-            BoxCollider collider = tile.AddComponent<BoxCollider>();
-            collider.UnScaledBounds = bounds;
-
-            MeshRendererComponent renderer = tile.AddComponent<MeshRendererComponent>();
-            renderer.Mesh = PrimitiveShape.CreateCube();
-            renderer.Colour = colour;
-
-            gameObjects.Add(tile);
-        }
-
-        private void parseTileData(int tileID, Vector3 position, ref Color colour, ref Vector3 scale)
-        {
-            switch ((MazeTile)tileID)
-            {
-                case MazeTile.WALL:
-                    colour = Color.Black;
-                    scale.Y = 5;
-                    break;
-                case MazeTile.FLOOR:
-                    colour = Color.White;
-                    break;
-                case MazeTile.HAZARD:
-                    colour = Color.White;
-                    addEnemyPoint(position + Vector3.Up);
-                    break;
-                case MazeTile.GOAL:
-                    colour = Color.White;
-                    //store it for spawning later, but still spawn a floor under
-                    addGoalPoint(position + Vector3.Up);
-                    break;
-                case MazeTile.P_START:
-                    addStartPoint(position + Vector3.Up);
-                    colour = Color.Gray;
-                    break;
-                case MazeTile.COLLECTABLE:
-                    colour = Color.MonoGameOrange;
-                    addCollectablePoint(position + Vector3.Up);
-                    break;
-                default:
-                    colour = Color.Orange;
-                    break;
-            }
-        }
-
-        private void addEnemyPoint(Vector3 pos)
-        {
-            if (enemyPoints == null)
-                enemyPoints = new Stack<Vector3>(1);
-            enemyPoints.Push(pos);
-        }
-
-        private void addCollectablePoint(Vector3 pos)
-        {
-            if (collectablePoints == null)
-                collectablePoints = new Stack<Vector3>(1);
-            collectablePoints.Push(pos);
-        }
-
-        private void addGoalPoint(Vector3 pos)
-        {
-            if (goalPoints == null)
-                goalPoints = new List<Vector3>(1);
-            goalPoints.Add(pos);
-        }
-
-        private void addStartPoint(Vector3 pos)
-        {
-            if (startPoints == null)
-                startPoints = new List<Vector3>(1);
-            startPoints.Add(pos);
-        }
-        #endregion
+        
         #region Player Creation
         private void createPlayer()
         {
@@ -194,9 +91,11 @@ namespace MazeEscape.GameUtilities
             player.transform.Position = getPlayerStart();
             //player important components
             player.AddComponent<Camera>();
-
             player.AddComponent<FirstPersonMover>();
             player.AddComponent<FirstPersonController>();
+            player.AddComponent<PlayerTracker>();
+            PlayerHUD HUD = player.AddComponent<PlayerHUD>();
+            HUD.TextColour = Color.Brown;
 
             BoxCollider playerCollider = player.AddComponent<BoxCollider>();
             playerCollider.UnScaledBounds = new BoundingBox(-Vector3.One / 4f, Vector3.One / 4f);
@@ -206,14 +105,14 @@ namespace MazeEscape.GameUtilities
 
         private Vector3 getPlayerStart()
         {
-            if (startPoints != null && startPoints.Count > 0)
+            if (builder.StartPoints != null && builder.StartPoints.Count > 0)
             {
-                if (startPoints.Count == 1)
-                    return startPoints[0];
-                else if (startPoints.Count > 1)
+                if (builder.StartPoints.Count == 1)
+                    return builder.StartPoints[0];
+                else if (builder.StartPoints.Count > 1)
                 {
                     Random random = new Random();
-                    return startPoints[random.Next(startPoints.Count)];
+                    return builder.StartPoints[random.Next(builder.StartPoints.Count)];
                 }
             }
 
@@ -235,14 +134,14 @@ namespace MazeEscape.GameUtilities
 
         private Vector3 getGoalPoint()
         {
-            if (goalPoints != null && goalPoints.Count > 0)
+            if (builder.GoalPoints != null && builder.GoalPoints.Count > 0)
             {
-                if (goalPoints.Count == 1)
-                    return goalPoints[0];
-                else if (goalPoints.Count > 1)
+                if (builder.GoalPoints.Count == 1)
+                    return builder.GoalPoints[0];
+                else if (builder.GoalPoints.Count > 1)
                 {
                     Random random = new Random();
-                    return goalPoints[random.Next(goalPoints.Count)];
+                    return builder.GoalPoints[random.Next(builder.GoalPoints.Count)];
                 }
             }
 
@@ -252,11 +151,11 @@ namespace MazeEscape.GameUtilities
         #region Enemy Creation
         private void createEnemies()
         {
-            if(enemyPoints != null)
+            if(builder.EnemyPoints != null)
             {
-                while(enemyPoints.Count > 0)
+                while(builder.EnemyPoints.Count > 0)
                 {
-                    createEnemy(enemyPoints.Pop());
+                    createEnemy(builder.EnemyPoints.Pop());
                 }
             }
         }
@@ -282,11 +181,11 @@ namespace MazeEscape.GameUtilities
         #region Collectable Creation
         private void createCollectables()
         {
-            if(collectablePoints != null)
+            if(builder.CollectablePoints != null)
             {
-                while(collectablePoints.Count > 0)
+                while(builder.CollectablePoints.Count > 0)
                 {
-                    createPointPickup(collectablePoints.Pop());
+                    createPointPickup(builder.CollectablePoints.Pop());
                 }
             }
         }

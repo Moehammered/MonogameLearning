@@ -42,8 +42,8 @@ namespace MazeEscape.GameComponents
             if (playerControl != null)
             {
                 startPursuit();
-                if (playerControl.hitGoal)
-                    purComp.Target = null;
+               /* if (playerControl.hitGoal)
+                    purComp.Target = null;*/
             }
             else
             {

@@ -42,6 +42,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BaseComponents\LineRenderer.cs" />
+    <Compile Include="BaseComponents\TextRenderer.cs" />
     <Compile Include="FSM\FiniteState.cs" />
     <Compile Include="FSM\FiniteStateMachine.cs" />
     <Compile Include="FSM\FSMInterpreter.cs" />
@@ -51,6 +52,9 @@
     <Compile Include="GameComponents\FirstPersonMover.cs" />
     <Compile Include="GameComponents\FirstPersonSounds.cs" />
     <Compile Include="GameComponents\Hazard.cs" />
+    <Compile Include="GameComponents\PlayerHUD.cs" />
+    <Compile Include="GameComponents\PlayerTracker.cs" />
+    <Compile Include="GameUtilities\LevelBuilder.cs" />
     <Compile Include="GameUtilities\LevelLoader.cs" />
     <Compile Include="GameUtilities\MazeScene.cs" />
     <Compile Include="GameUtilities\Scene.cs" />

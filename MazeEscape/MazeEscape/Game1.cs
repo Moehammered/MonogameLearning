@@ -47,17 +47,10 @@ namespace MazeEscape
         protected override void Initialize()
         {
             sceneTest = new MazeScene(this, 5);
-            //levelLoader = new LevelLoader();
             collisionService = new CollisionDetector();
-            // TODO: Add your initialization logic here
             Services.AddService<CollisionDetector>(collisionService);
             timer = Time.Instance;
-
-            /*createPlayer();
-            initialiseLevel();
-            createGoal();*/
-        
-            //sceneTest.Load();
+            
             base.Initialize();
         }
 
@@ -108,13 +101,6 @@ namespace MazeEscape
 
                 // TODO: Add your update logic here
                 timer.tick(ref gameTime);
-
-                //if(player != null && player.hitGoal)
-                //{
-                //    player.Owner.RemoveComponent<FirstPersonController>();
-                //    player = null;
-                //}
-
                 base.Update(gameTime);
 
                 collisionService.sweepDynamics();
@@ -133,27 +119,6 @@ namespace MazeEscape
             GraphicsDevice.Clear(Color.CornflowerBlue);
             
             base.Draw(gameTime);
-            renderHUD();
-        }
-
-        private void renderHUD()
-        {
-            spriteBatch.Begin();
-            //if(player == null)
-            //{
-            //    spriteBatch.DrawString(font, "You made it!", new Vector2(screenWidth / 3, screenHeight / 2), Color.White);
-            //}
-            //else if(player.dead)
-            //{
-            //    spriteBatch.DrawString(font, "You died!", new Vector2(screenWidth / 3, screenHeight / 2), Color.RosyBrown);
-            //}
-            //else
-            //{
-            //    spriteBatch.DrawString(font, "Find the green\nAvoid the red!", new Vector2(screenWidth / 4, screenHeight / 10), Color.RosyBrown);
-            //    spriteBatch.DrawString(font, "Points: " + player.points, new Vector2(screenWidth - screenWidth / 4, screenHeight / 10), Color.Yellow);
-            //}
-            spriteBatch.End();
-            GraphicsDevice.DepthStencilState = new DepthStencilState() { DepthBufferEnable = true };
         }
     }
 
