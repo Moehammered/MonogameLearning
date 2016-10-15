@@ -37,9 +37,7 @@ namespace MonogameLearning.GameComponents
                 {
                     mover = pursueTarget.GetComponent<MoveToComponent>();
                     if(mover != null)
-                    {
                         getTargetTrajectory();
-                    }
                 }
             }
         }
@@ -66,9 +64,7 @@ namespace MonogameLearning.GameComponents
         public override void Update(GameTime gameTime)
         {
             if(!arrived)
-            {
                 move();
-            }
             else if(pursueCooldown > 0)
             {
                 pursueCooldown -= Time.DeltaTime;

@@ -32,12 +32,9 @@ namespace MazeEscape.GameComponents
             purComp = owner.AddComponent<PursueComponent>();
             purComp.arrivalSpeed = 0.1f;
             purComp.Speed = 0.8f;
-            //purComp.Target = player;
             purComp.steerDuration = 0.2f;
             if(player != null)
-            {
                 playerControl = player.GetComponent<FirstPersonController>();
-            }
         }
 
         public override void Update(GameTime gameTime)
@@ -60,13 +57,9 @@ namespace MazeEscape.GameComponents
             {
                 Vector3 gradient = player.transform.Position - owner.transform.Position;
                 if(gradient.LengthSquared() < wakeupSqr)
-                {
                     purComp.Target = player;
-                }
                 else
-                {
                     purComp.Target = null;
-                }
             }
         }
 

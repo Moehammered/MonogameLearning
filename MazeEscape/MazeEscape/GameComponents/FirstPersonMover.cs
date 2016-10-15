@@ -24,7 +24,6 @@ namespace MazeEscape.GameComponents
 
         public override void Initialize()
         {
-
         }
 
         public void move(Vector3 direction)

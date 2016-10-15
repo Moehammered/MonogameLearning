@@ -7,7 +7,7 @@ namespace MonogameLearning.Pathfinding
 {
     class PathRenderComponent : Component
     {
-        public Color colour;
+        private Color colour;
         private LineRenderer renderer;
         private PathfinderComponent pathfinder;
         private Stack<GraphNode> currentPath;
@@ -17,6 +17,15 @@ namespace MonogameLearning.Pathfinding
         public PathRenderComponent()
         {
             colour = Color.White;
+        }
+
+        public Color Colour
+        {
+            get { return renderer.Colour; }
+            set
+            {
+                renderer.Colour = value;
+            }
         }
 
         public string PathInfo
@@ -72,9 +81,7 @@ namespace MonogameLearning.Pathfinding
         private void updateDisplay()
         {
             if(renderer != null)
-            {
-                 renderer.Vertices = pathPoints;
-            }
+                renderer.Vertices = pathPoints;
             updatePathInformation();
         }
 

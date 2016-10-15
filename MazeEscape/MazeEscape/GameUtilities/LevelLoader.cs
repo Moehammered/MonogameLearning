@@ -42,6 +42,17 @@ namespace MazeEscape.GameUtilities
             file = new FileLoader();
         }
 
+        public int LevelCount
+        {
+            get
+            {
+                if (levels != null)
+                    return levels.Length;
+                else
+                    return -1;
+            }
+        }
+
         public void loadLevelFiles()
         {
             Console.WriteLine(Environment.CurrentDirectory);
@@ -51,7 +62,7 @@ namespace MazeEscape.GameUtilities
                 levels = dir.GetFiles();
                 Console.WriteLine("Levels found: " + levels.Length);
             }
-            catch(DirectoryNotFoundException exc)
+            catch(DirectoryNotFoundException)
             {
                 levels = new FileInfo[0];
             }
@@ -68,9 +79,7 @@ namespace MazeEscape.GameUtilities
                     {
                         //found the level, perform the loading stuff
                         if (parseLevel(level.FullName, out data))
-                        {
                             return true;
-                        }
                         else
                             return false;
                     }

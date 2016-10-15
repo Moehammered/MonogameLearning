@@ -55,3 +55,12 @@
 #begin fsm_npc1.xml
 /copy:fsm_npc1.xml
 
+#begin Levels/Level3.txt
+/copy:Levels/Level3.txt
+
+#begin Levels/Level4.txt
+/copy:Levels/Level4.txt
+
+#begin Levels/Level5.txt
+/copy:Levels/Level5.txt
+

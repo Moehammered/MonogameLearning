@@ -9,12 +9,12 @@ namespace MazeEscape.GameComponents
 {
     class FirstPersonController : Component
     {
-        public SoundEffectInstance moveSound, deathSound, winSound;
         public bool hitGoal = false, dead = false;
         public int points;
         private Keys[] movementKeys;
         private Vector3 movementDirection;
         private FirstPersonMover fpMover;
+        private FirstPersonSounds sounds;
         private const int FORWARD_KEY = 0, BACK_KEY = 1, 
             LEFT_KEY = 2, RIGHT_KEY = 3, MAX_KEYS = 4;
         private float stunTimer = 1;
@@ -57,11 +57,16 @@ namespace MazeEscape.GameComponents
         public override void Initialize()
         {
             //make sure we have a first person mover on our gameobject
+            Console.WriteLine("Initialising PlayerController!!!!");
             fpMover = owner.GetComponent<FirstPersonMover>();
             if (fpMover == null)
                 fpMover = owner.AddComponent<FirstPersonMover>();
             fpMover.lookSensitivity = 20;
             fpMover.speed = 3;
+            //get our component in charge of managing our sounds
+            sounds = owner.GetComponent<FirstPersonSounds>();
+            if (sounds == null)
+                sounds = owner.AddComponent<FirstPersonSounds>();
         }
 
         public override void Update(GameTime gameTime)
@@ -104,14 +109,10 @@ namespace MazeEscape.GameComponents
             if (movementDirection.LengthSquared() > 0)
             {
                 movementDirection.Normalize();
-                if (moveSound != null)
-                {
-                    if (moveSound.State == SoundState.Stopped)
-                        moveSound.Play();
-                }
+                sounds.playMoveSound();
             }
-            else if(moveSound != null)
-                moveSound.Stop();
+            else
+                sounds.stopMoveSound();
         }
 
         private void checkCameraMovement()
@@ -133,11 +134,10 @@ namespace MazeEscape.GameComponents
             if (other.name == "goal")
             {
                 hitGoal = true;
-                if (winSound != null)
-                    winSound.Play();
-                moveSound.Stop();
+                sounds.stopMoveSound();
+                sounds.playWinSound();
             }
-            else if (other.name == "hazard")
+            else if (other.name == "enemy")
             {
                 /*dead = true;
                 if (deathSound != null)
@@ -148,7 +148,7 @@ namespace MazeEscape.GameComponents
             else if(other.name == "pickup")
             {
                 points++;
-                winSound.Play();
+                sounds.playWinSound();
                 other.RemoveComponent<MeshRendererComponent>(); //remove rendering of pickup
                 other.transform.Translate(0, -1000, 0); //move it out of the way to avoid unnecessary repeated collisions
             }

@@ -18,6 +18,12 @@ namespace MonogameLearning.BaseComponents
             gameInstance = null;
         }
 
+        //easier access to component owner's transform
+        public Transform transform
+        {
+            get { return owner.transform; }
+        }
+
         public Game GameInstance
         {
             get { return gameInstance; }

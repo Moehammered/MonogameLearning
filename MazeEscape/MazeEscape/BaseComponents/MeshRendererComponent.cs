@@ -7,7 +7,7 @@ namespace MonogameLearning.BaseComponents
 {
     class MeshRendererComponent : RenderComponent
     {
-        public Color colour;
+        private Color colour;
         protected VertexBuffer buffer;
         protected IndexBuffer indexBuffer;
         protected StaticMesh mesh;
@@ -16,6 +16,22 @@ namespace MonogameLearning.BaseComponents
         public MeshRendererComponent() : base()
         {
             colour = Color.White;
+        }
+
+        public Color Colour
+        {
+            get { return colour; }
+            set
+            {
+                colour = value;
+                if (material != null)
+                    material.DiffuseColor = colour.ToVector3();
+                else
+                {
+                    material = new BasicEffect(GraphicsDevice);
+                    material.DiffuseColor = colour.ToVector3();
+                }
+            }
         }
 
         public StaticMesh Mesh
@@ -39,19 +55,20 @@ namespace MonogameLearning.BaseComponents
         public BasicEffect Material
         {
             get { return material; }
-            set { if (value != null) material = value; }
+            set { material = value; }
         }
 
         public override void Initialize()
         {
-            material = new BasicEffect(GraphicsDevice);
+            if(material == null)
+                material = new BasicEffect(GraphicsDevice);
             material.VertexColorEnabled = true;
             material.DiffuseColor = colour.ToVector3();
         }
 
         public override void Draw(GameTime gameTime)
         {
-            if(mesh != null)
+            if(mesh != null && material != null)
             {
                 GraphicsDevice.SetVertexBuffer(buffer);
                 GraphicsDevice.Indices = indexBuffer;

@@ -7,7 +7,7 @@ namespace MonogameLearning.BaseComponents
 {
     class LineRenderer : RenderComponent
     {
-        public Color colour;
+        private Color colour;
         private BasicEffect material;
         private VertexPositionColor[] vertexBuffer;
         private VertexBuffer buffer;
@@ -23,18 +23,17 @@ namespace MonogameLearning.BaseComponents
         {
             get
             {
-                if(material != null)
-                {
-                    return new Color(material.DiffuseColor);
-                }
-                return Color.Black;
+                return colour;
             }
             set
             {
                 colour = value;
                 if (material != null)
+                    material.DiffuseColor = colour.ToVector3();
+                else
                 {
-                    material.DiffuseColor = value.ToVector3();
+                    material = new BasicEffect(GraphicsDevice);
+                    material.DiffuseColor = colour.ToVector3();
                 }
             }
         }
@@ -83,7 +82,8 @@ namespace MonogameLearning.BaseComponents
 
         public override void Initialize()
         {
-            material = new BasicEffect(GraphicsDevice);
+            if(material == null)
+                material = new BasicEffect(GraphicsDevice);
             material.VertexColorEnabled = true;
             material.DiffuseColor = colour.ToVector3();
         }

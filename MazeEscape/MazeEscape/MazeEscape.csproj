@@ -49,8 +49,11 @@
     <Compile Include="GameComponents\ArriveAtComponent.cs" />
     <Compile Include="GameComponents\FirstPersonController.cs" />
     <Compile Include="GameComponents\FirstPersonMover.cs" />
+    <Compile Include="GameComponents\FirstPersonSounds.cs" />
     <Compile Include="GameComponents\Hazard.cs" />
     <Compile Include="GameUtilities\LevelLoader.cs" />
+    <Compile Include="GameUtilities\MazeScene.cs" />
+    <Compile Include="GameUtilities\Scene.cs" />
     <Compile Include="Graphics\PrimitiveShape.cs" />
     <Compile Include="Graphics\StaticMesh.cs" />
     <Compile Include="GameComponents\MoveToComponent.cs" />
@@ -97,6 +100,7 @@
     <Content Include="Content\Levels\Level2.txt" />
     <Content Include="Content\Levels\Level3.txt" />
     <Content Include="Content\Levels\Level4.txt" />
+    <Content Include="Content\Levels\Level5.txt" />
     <Content Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup>
