@@ -68,15 +68,18 @@ namespace MazeEscape.GameComponents
 
         public override void Update(GameTime gameTime)
         {
-            checkCameraMovement();
-            if (stunTimer < 0)
+            if (enabled)
             {
-                checkMovementKeys();
-                fpMover.move(movementDirection);
-            }
-            else
-            {
-                stunTimer -= Time.DeltaTime;
+                checkCameraMovement();
+                if (stunTimer < 0)
+                {
+                    checkMovementKeys();
+                    fpMover.move(movementDirection);
+                }
+                else
+                {
+                    stunTimer -= Time.DeltaTime;
+                }
             }
         }
 

@@ -1,6 +1,7 @@
 ﻿using FiniteStateMachine.FSM;
 using FiniteStateMachine.GameComponents;
 using MazeEscape.GameComponents;
+using MazeEscape.Utilities;
 using Microsoft.Xna.Framework;
 using MonogameLearning.BaseComponents;
 using MonogameLearning.Graphics;
@@ -19,6 +20,7 @@ namespace MazeEscape.GameUtilities
         HAZARD,
         GOAL,
         P_START,
+        POWER_PILL = 8,
         COLLECTABLE = 9
     }
 
@@ -28,6 +30,7 @@ namespace MazeEscape.GameUtilities
         private LevelGraph graph;
         private LevelBuilder builder;
         private PlayerTracker playerStatus;
+        private SpatialGrid spacialPartition;
         private bool active;
         private int levelNumber;
 
@@ -75,10 +78,15 @@ namespace MazeEscape.GameUtilities
             if (loader.loadLevel("Level" + levelNumber + ".txt", out level))
             {
                 //found level successfully
+                spacialPartition = new SpatialGrid(4, level);
+                spacialPartition.prepareGrid();
+                CollisionDetector detector = GameInstance.Services.GetService<CollisionDetector>();
+                //Uncomment this line to see broken spatial partition
+                //detector.Partitioner = spacialPartition;
                 builder.createLevelTiles(level);
                 graph = new LevelGraph(level);
                 graph.buildGraph();
-
+                
                 createPlayer();
                 createGoal();
                 createEnemies();
@@ -199,6 +207,11 @@ namespace MazeEscape.GameUtilities
                     createPointPickup(builder.CollectablePoints.Pop());
                 }
             }
+            if(builder.PowerPoints != null)
+            {
+                while (builder.PowerPoints.Count > 0)
+                    createPowerPill(builder.PowerPoints.Pop());
+            }
         }
 
         private void createPointPickup(Vector3 position)
@@ -210,6 +223,19 @@ namespace MazeEscape.GameUtilities
             MeshRendererComponent hazRend = pickup.AddComponent<MeshRendererComponent>();
             hazRend.Mesh = PrimitiveShape.CreateCube();
             hazRend.Colour = Color.Yellow;
+            Vector3 corner = new Vector3(-0.5f, -0.5f, -0.5f);
+            pickup.AddComponent<BoxCollider>().UnScaledBounds = new BoundingBox(corner, -corner);
+        }
+
+        private void createPowerPill(Vector3 position)
+        {
+            GameObject pickup = new GameObject(GameInstance);
+            pickup.transform.Scale = new Vector3(1/5f, 1/4f, 1/5f);
+            pickup.transform.Position = position;
+            pickup.name = "power";
+            MeshRendererComponent hazRend = pickup.AddComponent<MeshRendererComponent>();
+            hazRend.Mesh = PrimitiveShape.CreateCube();
+            hazRend.Colour = Color.Green;
             Vector3 corner = new Vector3(-0.5f, -0.5f, -0.5f);
             pickup.AddComponent<BoxCollider>().UnScaledBounds = new BoundingBox(corner, -corner);
         }

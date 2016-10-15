@@ -8,6 +8,7 @@ using MonogameLearning.Utilities;
 using MazeEscape.GameUtilities;
 using MazeEscape.GameComponents;
 using Microsoft.Xna.Framework.Audio;
+using MazeEscape.Utilities;
 
 namespace MazeEscape
 {
@@ -20,6 +21,7 @@ namespace MazeEscape
         private SpriteBatch spriteBatch;
         private SpriteFont font;
         #region Game Properties
+        private int levelNumber = 1;
         private MazeScene sceneTest;
         private bool gameInitialised = false;
         private int screenWidth = 1280, screenHeight = 720;
@@ -46,7 +48,7 @@ namespace MazeEscape
         /// </summary>
         protected override void Initialize()
         {
-            sceneTest = new MazeScene(this, 5);
+            sceneTest = new MazeScene(this, levelNumber);
             collisionService = new CollisionDetector();
             Services.AddService<CollisionDetector>(collisionService);
             timer = Time.Instance;
@@ -103,7 +105,7 @@ namespace MazeEscape
                 timer.tick(ref gameTime);
                 base.Update(gameTime);
 
-                collisionService.sweepDynamics();
+                collisionService.checkCollisions();
                 GameObject.ProcessDestroyQueue();
                 //keep track of pressed buttons this frame before going to next
                 Input.recordInputs();

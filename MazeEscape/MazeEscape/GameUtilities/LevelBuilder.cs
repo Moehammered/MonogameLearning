@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using MonogameLearning.BaseComponents;
 using MonogameLearning.Graphics;
+using MonogameLearning.Utilities;
 using System.Collections.Generic;
 
 namespace MazeEscape.GameUtilities
@@ -14,7 +15,7 @@ namespace MazeEscape.GameUtilities
         private List<Vector3> goalPoints;
         //all things which will be spawned sequentially
         private Stack<Vector3> enemyPoints;
-        private Stack<Vector3> collectablePoints;
+        private Stack<Vector3> collectablePoints, powerPillPoints;
         
         public LevelBuilder(Game instance, Scene scene)
         {
@@ -35,6 +36,11 @@ namespace MazeEscape.GameUtilities
         public Stack<Vector3> EnemyPoints
         {
             get { return enemyPoints; }
+        }
+
+        public Stack<Vector3> PowerPoints
+        {
+            get { return powerPillPoints; }
         }
 
         public Stack<Vector3> CollectablePoints
@@ -72,6 +78,8 @@ namespace MazeEscape.GameUtilities
 
             BoxCollider collider = tile.AddComponent<BoxCollider>();
             collider.UnScaledBounds = bounds;
+            CollisionDetector col = GameInstance.Services.GetService<CollisionDetector>();
+            col.addStaticCollider(collider);
 
             MeshRendererComponent renderer = tile.AddComponent<MeshRendererComponent>();
             renderer.Mesh = PrimitiveShape.CreateCube();
@@ -104,6 +112,10 @@ namespace MazeEscape.GameUtilities
                     addStartPoint(position + Vector3.Up);
                     colour = Color.Gray;
                     break;
+                case MazeTile.POWER_PILL:
+                    colour = Color.White;
+                    addPowerPoint(position + Vector3.Up);
+                    break;
                 case MazeTile.COLLECTABLE:
                     colour = Color.MonoGameOrange;
                     addCollectablePoint(position + Vector3.Up);
@@ -126,6 +138,13 @@ namespace MazeEscape.GameUtilities
             if (collectablePoints == null)
                 collectablePoints = new Stack<Vector3>(1);
             collectablePoints.Push(pos);
+        }
+
+        private void addPowerPoint(Vector3 pos)
+        {
+            if (powerPillPoints == null)
+                powerPillPoints = new Stack<Vector3>(1);
+            powerPillPoints.Push(pos);
         }
 
         private void addGoalPoint(Vector3 pos)

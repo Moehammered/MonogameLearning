@@ -1,12 +1,14 @@
 ﻿using MonogameLearning.BaseComponents;
 using Microsoft.Xna.Framework;
+using MonogameLearning.Utilities;
 
 namespace MazeEscape.GameComponents
 {
     class PlayerTracker : Component
     {
-        public bool hitGoal = false, dead = false, isPoweredUp = true;
+        public bool hitGoal = false, dead = false, isPoweredUp = false;
         public int points;
+        private float closeGameTime = -1;
 
         private FirstPersonSounds sounds;
 
@@ -27,6 +29,12 @@ namespace MazeEscape.GameComponents
         {
             if (sounds == null) //make sure there is a reference
                 sounds = owner.GetComponent<FirstPersonSounds>();
+            if(closeGameTime > 0)
+            {
+                closeGameTime -= Time.DeltaTime;
+                if (closeGameTime < 0)
+                    GameInstance.Exit();
+            }
         }
 
         public void OnCollision(GameObject other)
@@ -36,6 +44,11 @@ namespace MazeEscape.GameComponents
                 hitGoal = true;
                 sounds.stopMoveSound();
                 sounds.playWinSound();
+                //owner.RemoveComponent<FirstPersonController>();
+                FirstPersonController control = owner.GetComponent<FirstPersonController>();
+                if (control != null)
+                    control.Enabled = false;
+                closeGameTime = 1;
             }
             else if (other.name == "enemy")
             {
@@ -46,7 +59,11 @@ namespace MazeEscape.GameComponents
                 }
                 else
                 {
-                    owner.RemoveComponent<FirstPersonController>();
+                    //owner.RemoveComponent<FirstPersonController>();
+                    FirstPersonController control = owner.GetComponent<FirstPersonController>();
+                    if (control != null)
+                        control.Enabled = false;
+                    sounds.stopAllSounds();
                     dead = true;
                 }
             }
@@ -54,6 +71,11 @@ namespace MazeEscape.GameComponents
             {
                 addScore();
                 other.transform.Translate(0, -1000, 0); //move it out of the way to avoid unnecessary repeated collisions
+                GameObject.DestroyTest(other);
+            }
+            else if(other.name == "power")
+            {
+                isPoweredUp = true;
                 GameObject.DestroyTest(other);
             }
         }
