@@ -123,16 +123,7 @@ namespace MazeEscape.GameComponents
         public void OnCollision(GameObject other)
         {
             Console.WriteLine("Player Collided with: " + other.name);
-            if (other.name == "goal")
-            {
-                sounds.stopMoveSound();
-                sounds.playWinSound();
-            }
-            else if(other.name == "pickup")
-            {
-                sounds.playWinSound();
-            }
-            else if(other.name == "obstacle")
+            if(other.name == "obstacle")
             {
                 fpMover.move(-movementDirection);
                 stunTimer = 0.5f;

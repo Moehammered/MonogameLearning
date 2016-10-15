@@ -10,8 +10,8 @@ namespace MonogameLearning.Pathfinding
         private List<GraphNode> nodeGraph;
         private GraphNode[,] gridNodes;
         private LevelData level;
-        private const int GRASS_ID = 0, SAND_ID = 1, BLOCK_ID = 2,
-            WATER_ID = 3, LAVA_ID = 4;
+        private const int GROUND_ID = 1, WALL_ID = 0,
+            SLOW_ID = 5, ENEMY_ID = 2, COLLECT_ID = 9, GOAL_ID = 3;
 
         public LevelGraph(LevelData level)
         {
@@ -111,15 +111,15 @@ namespace MonogameLearning.Pathfinding
         {
             switch (id)
             {
-                case GRASS_ID:
+                case GROUND_ID:
                     return new GraphNode(1);
-                case SAND_ID:
+                case COLLECT_ID:
                     return new GraphNode(2);
-                case BLOCK_ID:
+                case WALL_ID:
                     return null;
-                case WATER_ID:
+                case SLOW_ID:
                     return new GraphNode(5);
-                case LAVA_ID:
+                case ENEMY_ID:
                     return new GraphNode(10);
                 default:
                     return null;

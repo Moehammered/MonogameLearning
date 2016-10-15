@@ -1,7 +1,10 @@
-﻿using MazeEscape.GameComponents;
+﻿using FiniteStateMachine.FSM;
+using FiniteStateMachine.GameComponents;
+using MazeEscape.GameComponents;
 using Microsoft.Xna.Framework;
 using MonogameLearning.BaseComponents;
 using MonogameLearning.Graphics;
+using MonogameLearning.Pathfinding;
 using MonogameLearning.Utilities;
 using System;
 using System.Collections.Generic;
@@ -22,7 +25,9 @@ namespace MazeEscape.GameUtilities
     class MazeScene : Scene
     {
         private LevelLoader loader;
+        private LevelGraph graph;
         private LevelBuilder builder;
+        private PlayerTracker playerStatus;
         private bool active;
         private int levelNumber;
 
@@ -71,6 +76,9 @@ namespace MazeEscape.GameUtilities
             {
                 //found level successfully
                 builder.createLevelTiles(level);
+                graph = new LevelGraph(level);
+                graph.buildGraph();
+
                 createPlayer();
                 createGoal();
                 createEnemies();
@@ -93,7 +101,7 @@ namespace MazeEscape.GameUtilities
             player.AddComponent<Camera>();
             player.AddComponent<FirstPersonMover>();
             player.AddComponent<FirstPersonController>();
-            player.AddComponent<PlayerTracker>();
+            playerStatus = player.AddComponent<PlayerTracker>();
             PlayerHUD HUD = player.AddComponent<PlayerHUD>();
             HUD.TextColour = Color.Brown;
 
@@ -172,10 +180,13 @@ namespace MazeEscape.GameUtilities
             hazRend.Colour = Color.Red;
             Vector3 corner = new Vector3(-0.5f, -0.5f, -0.5f);
             enemy.AddComponent<BoxCollider>().UnScaledBounds = new BoundingBox(corner, -corner);
+            //setup the AI
+            PathfinderComponent pather = enemy.AddComponent<PathfinderComponent>();
+            pather.setAlgorithm<AStarPathing>(graph);
+            NPCController controller = enemy.AddComponent<NPCController>();
+            controller.player = playerStatus;
+
             gameObjects.Add(enemy);
-            /*Hazard ai = hazard.AddComponent<Hazard>();
-            ai.player = camera;
-            ai.WakeUpDistance = 7;*/
         }
         #endregion
         #region Collectable Creation

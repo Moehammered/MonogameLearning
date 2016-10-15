@@ -52,8 +52,10 @@
     <Compile Include="GameComponents\FirstPersonMover.cs" />
     <Compile Include="GameComponents\FirstPersonSounds.cs" />
     <Compile Include="GameComponents\Hazard.cs" />
+    <Compile Include="GameComponents\NPCController.cs" />
     <Compile Include="GameComponents\PlayerHUD.cs" />
     <Compile Include="GameComponents\PlayerTracker.cs" />
+    <Compile Include="GameComponents\PowerUpPill.cs" />
     <Compile Include="GameUtilities\LevelBuilder.cs" />
     <Compile Include="GameUtilities\LevelLoader.cs" />
     <Compile Include="GameUtilities\MazeScene.cs" />
@@ -99,6 +101,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\fsm_npc1.xml" />
     <Content Include="Content\Levels\Level0.txt" />
     <Content Include="Content\Levels\Level1.txt" />
     <Content Include="Content\Levels\Level2.txt" />

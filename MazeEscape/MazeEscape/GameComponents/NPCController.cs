@@ -5,14 +5,15 @@ using MonogameLearning.Pathfinding;
 using System.Collections.Generic;
 using FiniteStateMachine.FSM;
 using MonogameLearning.Utilities;
+using MazeEscape.GameComponents;
 using System;
 
 namespace FiniteStateMachine.GameComponents
 {
     class NPCController : Component
     {
-        public PlayerController player;
-        public FSM.FiniteStateMachine machine;
+        public PlayerTracker player;
+        private FSM.FiniteStateMachine machine;
         private float playerNearDistance = 2;
         private float pndSquared = 4;
         private float playerFarDistance = 4;
@@ -23,9 +24,21 @@ namespace FiniteStateMachine.GameComponents
         private const int groundHeight = 1;
         private PathfinderComponent pather;
         private Stack<GraphNode> currentPath;
+        private FSMInterpreter parser;
 
         public NPCController()
         {
+        }
+
+        public FSM.FiniteStateMachine Machine
+        {
+            get { return machine; }
+            set
+            {
+                machine = value;
+                assignMachineDelegates();
+                machine.initialiseMachine();
+            }
         }
 
         public float PlayerNearDistance
@@ -56,11 +69,12 @@ namespace FiniteStateMachine.GameComponents
 
         public override void Initialize()
         {
+            parser = new FSMInterpreter("fsm_npc1.xml");
+            parser.parseFile();
             setupArriveComponent();
             pather = Owner.GetComponent<PathfinderComponent>();
             setRandomDestination();
-            assignMachineDelegates();
-            machine.initialiseMachine();
+            Machine = parser.Machine;
         }
 
         private void setRandomDestination()
@@ -77,14 +91,16 @@ namespace FiniteStateMachine.GameComponents
                 mover = owner.AddComponent<ArriveAtComponent>();
                 mover.Speed = 1;
                 mover.steerDuration = 0.25f;
-                mover.MinimumDistance = 0.25f;
+                mover.MinimumDistance = 0.1f;
             }
         }
 
         public override void Update(GameTime gameTime)
         {
             if (this.enabled)
-                machine.processState();
+            {
+                machine.processState(); //calls assigned delegates for the machine, see bottom of NPCController
+            }
             else
                 Owner.Destroy();
         }
@@ -95,31 +111,34 @@ namespace FiniteStateMachine.GameComponents
             {
                 if (player.isPoweredUp)
                 {
+                    Console.WriteLine("Touched ya!");
                     currentPath = null;
                     mover.abortMovement();
                     this.Enabled = false;
                 }
             }
         }
+        
+        public override void Destroy()
+        {
+        }
 
         #region State Machine Tasks
         private void moveToRandomNode()
         {
             if(repathTimer > 0)
-            {
                 repathTimer -= Time.DeltaTime;
-                if(repathTimer < 0)
-                {
-                    repathTimer = idleRepathTime;
-                    mover.abortMovement();
-                    setRandomDestination();
-                }
-            }
             if (currentPath != null)
             {
                 if (currentPath.Count > 0 && mover.Arrived)
                 {
-                    mover.Destination = currentPath.Pop().position + Vector3.Up * groundHeight;
+                    if (repathTimer < 0)
+                    {
+                        repathTimer = idleRepathTime;
+                        setRandomDestination();
+                    }
+                    else
+                        mover.Destination = currentPath.Pop().position + Vector3.Up * groundHeight;
                 }
                 else if (mover.Arrived)
                 {
@@ -130,19 +149,22 @@ namespace FiniteStateMachine.GameComponents
 
         private void moveAwayFromPlayer()
         {
-            repathTimer -= Time.DeltaTime;
-            if (repathTimer < 0)
-            {
-                repathTimer = evadeRepathTime;
-                Vector3 dir = player.Owner.transform.Position - owner.transform.Position;
-                dir.Normalize();
-                currentPath = pather.findPath(owner.transform.Position, owner.transform.Position - dir * 3);
-            }
+            if(repathTimer > 0)
+                repathTimer -= Time.DeltaTime;
+            
             if (currentPath != null)
             {
                 if (currentPath.Count > 0 && mover.Arrived)
                 {
-                    mover.Destination = currentPath.Pop().position + Vector3.Up * groundHeight;
+                    if (repathTimer < 0)
+                    {
+                        repathTimer = evadeRepathTime;
+                        Vector3 dir = player.Owner.transform.Position - owner.transform.Position;
+                        dir.Normalize();
+                        currentPath = pather.findPath(owner.transform.Position, owner.transform.Position - dir * 3);
+                    }
+                    else
+                        mover.Destination = currentPath.Pop().position + Vector3.Up * groundHeight;
                 }
                 else if (mover.Arrived)
                 {
@@ -153,21 +175,25 @@ namespace FiniteStateMachine.GameComponents
 
         private void moveToPlayer()
         {
-            repathTimer -= Time.DeltaTime;
-            if (repathTimer < 0)
-            {
-                repathTimer = pursueRepathTime;
-                currentPath = pather.findPath(owner.transform.Position, player.Owner.transform.Position);
-                mover.abortMovement();
-            }
+            if(repathTimer > 0)
+                repathTimer -= Time.DeltaTime;
+            
             if (currentPath != null)
             {
                 if (currentPath.Count > 0 && mover.Arrived)
                 {
-                    mover.Destination = currentPath.Pop().position + Vector3.Up * groundHeight;
+                    if (repathTimer < 0)
+                    {
+                        repathTimer = pursueRepathTime;
+                        currentPath = pather.findPath(owner.transform.Position, player.Owner.transform.Position);
+                        mover.abortMovement();
+                    }
+                    else
+                        mover.Destination = currentPath.Pop().position + Vector3.Up * groundHeight;
                 }
                 else if (mover.Arrived)
                 {
+                    Console.WriteLine("I gotchya!");
                     setRandomDestination();
                 }
             }
@@ -264,6 +290,7 @@ namespace FiniteStateMachine.GameComponents
         {
             return !player.isPoweredUp;
         }
+
         #endregion
     }
 }

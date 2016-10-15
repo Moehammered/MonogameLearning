@@ -28,6 +28,7 @@ namespace FiniteStateMachine.FSM
             {
                 string index = file.Attribute("activeFSM").Value;
                 int parsedInd = Int32.Parse(index);
+                machines[parsedInd].initialiseMachine();
                 return machines[parsedInd];
             }
         }

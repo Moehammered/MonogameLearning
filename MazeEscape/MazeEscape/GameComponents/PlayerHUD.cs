@@ -56,6 +56,11 @@ namespace MazeEscape.GameComponents
                 {
                     message = "Find the green exit.\nAvoid the red enemies!";
                     message += "\n    Points: " + player.points;
+                    if (player.isPoweredUp)
+                    {
+                        message += "\nEat the enemies!";
+                        uiText.colour = Color.Gold;
+                    }
                 }
                 uiText.text = message;
             }

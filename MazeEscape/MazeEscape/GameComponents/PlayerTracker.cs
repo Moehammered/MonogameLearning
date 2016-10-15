@@ -5,8 +5,10 @@ namespace MazeEscape.GameComponents
 {
     class PlayerTracker : Component
     {
-        public bool hitGoal = false, dead = false;
+        public bool hitGoal = false, dead = false, isPoweredUp = true;
         public int points;
+
+        private FirstPersonSounds sounds;
 
         public PlayerTracker()
         {
@@ -18,10 +20,13 @@ namespace MazeEscape.GameComponents
 
         public override void Initialize()
         {
+            sounds = owner.GetComponent<FirstPersonSounds>();
         }
 
         public override void Update(GameTime gameTime)
         {
+            if (sounds == null) //make sure there is a reference
+                sounds = owner.GetComponent<FirstPersonSounds>();
         }
 
         public void OnCollision(GameObject other)
@@ -29,22 +34,34 @@ namespace MazeEscape.GameComponents
             if (other.name == "goal")
             {
                 hitGoal = true;
+                sounds.stopMoveSound();
+                sounds.playWinSound();
             }
             else if (other.name == "enemy")
             {
-                /*dead = true;
-                if (deathSound != null)
-                    deathSound.Play();
-                moveSound.Stop();*/
-                GameObject.DestroyTest(other);
+                if(isPoweredUp)
+                {
+                    addScore(5);
+                    GameObject.DestroyTest(other);
+                }
+                else
+                {
+                    owner.RemoveComponent<FirstPersonController>();
+                    dead = true;
+                }
             }
             else if (other.name == "pickup")
             {
-                points++;
-                //other.RemoveComponent<MeshRendererComponent>(); //remove rendering of pickup
+                addScore();
                 other.transform.Translate(0, -1000, 0); //move it out of the way to avoid unnecessary repeated collisions
                 GameObject.DestroyTest(other);
             }
+        }
+
+        private void addScore(int amount = 1)
+        {
+            points += amount;
+            sounds.playWinSound();
         }
     }
 }

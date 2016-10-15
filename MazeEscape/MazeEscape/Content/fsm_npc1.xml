@@ -14,7 +14,7 @@ Allowed conditions:
 - PLAYER_FAR
 -->
 
-<machines name="AI_Machines" activeFSM="1">
+<machines name="AI_Machines" activeFSM="0">
 	<fsm name="npc1" startState="IDLE">
 	  <state name="IDLE">
 		<transition condition="PLAYER_NEAR" toState="PURSUE" />

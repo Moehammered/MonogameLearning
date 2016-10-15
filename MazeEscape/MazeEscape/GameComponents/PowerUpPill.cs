@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using MonogameLearning.Utilities;
 using MonogameLearning.GameComponents;
+using System;
 
 namespace FiniteStateMachine.GameComponents
 {
@@ -47,10 +48,14 @@ namespace FiniteStateMachine.GameComponents
         {
             if(col.name == "Player")
             {
-                PlayerController player = col.GetComponent<PlayerController>();
+                /*PlayerController player = col.GetComponent<PlayerController>();
                 player.isPoweredUp = true;
-                this.enabled = false;
+                this.enabled = false;*/
             }
+        }
+
+        public override void Destroy()
+        {
         }
     }
 }
