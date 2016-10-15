@@ -72,6 +72,8 @@ namespace MonogameLearning.BaseComponents
 
         public abstract void Update(GameTime gameTime);
 
+        public abstract void Destroy();
+
         /*public static bool operator ==(Component a, Component b)
         {
             return a.Equals(b);

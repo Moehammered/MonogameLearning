@@ -1,6 +1,7 @@
 ﻿using MonogameLearning.BaseComponents;
 using Microsoft.Xna.Framework;
 using MonogameLearning.Utilities;
+using System;
 
 namespace MazeEscape.GameComponents
 {
@@ -49,7 +50,10 @@ namespace MazeEscape.GameComponents
 
         public override void Update(GameTime gameTime)
         {
+        }
 
+        public override void Destroy()
+        {
         }
     }
 }

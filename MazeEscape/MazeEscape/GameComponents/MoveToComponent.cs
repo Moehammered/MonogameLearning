@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using MonogameLearning.BaseComponents;
 using MonogameLearning.Utilities;
 
@@ -99,6 +100,10 @@ namespace MonogameLearning.GameComponents
                 arrived = true;
                 currentSpeed = 0;
             }
+        }
+
+        public override void Destroy()
+        {
         }
     }
 }

@@ -139,10 +139,11 @@ namespace MazeEscape.GameComponents
             }
             else if (other.name == "hazard")
             {
-                dead = true;
+                /*dead = true;
                 if (deathSound != null)
                     deathSound.Play();
-                moveSound.Stop();
+                moveSound.Stop();*/
+                GameObject.DestroyTest(other);
             }
             else if(other.name == "pickup")
             {
@@ -162,6 +163,10 @@ namespace MazeEscape.GameComponents
         {
             Console.WriteLine("Player left");
             hitGoal = false;
+        }
+
+        public override void Destroy()
+        {
         }
     }
 }

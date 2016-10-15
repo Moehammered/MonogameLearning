@@ -1,5 +1,6 @@
 ﻿using MonogameLearning.Utilities;
 using Microsoft.Xna.Framework;
+using System;
 
 namespace MonogameLearning.BaseComponents
 {
@@ -59,6 +60,12 @@ namespace MonogameLearning.BaseComponents
         {
             scaledBounds.Min = unscaledBounds.Min * owner.transform.Scale;
             scaledBounds.Max = unscaledBounds.Max * owner.transform.Scale;
+        }
+
+        public override void Destroy()
+        {
+            CollisionDetector det = GameInstance.Services.GetService<CollisionDetector>();
+            det.removeCollider(this);
         }
     }
 }

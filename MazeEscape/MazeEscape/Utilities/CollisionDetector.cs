@@ -31,6 +31,11 @@ namespace MonogameLearning.Utilities
             colliders.Add(col);
         }
 
+        public void removeCollider(BoxCollider col)
+        {
+            colliders.Remove(col);
+        }
+
         public void addDynamicCollider(BoxCollider col)
         {
             colliders.Remove(col);

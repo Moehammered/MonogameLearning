@@ -11,6 +11,7 @@ namespace MonogameLearning.BaseComponents
         public Transform transform;
         private List<Component> components;
         private Game gameInstance;
+        private static Stack<GameObject> destroyStack;
 
         public GameObject(Game game)
         {
@@ -18,6 +19,41 @@ namespace MonogameLearning.BaseComponents
             components = new List<Component>();
             gameInstance = game;
             name = "GameObject";
+        }
+
+        public static void ProcessDestroyQueue()
+        {
+            while(destroyStack != null && destroyStack.Count > 0)
+            {
+                GameObject go = destroyStack.Pop();
+                for(int i = 0; i < go.components.Count; i++)
+                {
+                    //remove the component from the game list of components
+                    go.gameInstance.Components.Remove(go.components[i]);
+                    //call the component's destroy function
+                    go.components[i].Destroy();
+                    //nullify all references to this component to allow GC to free memory
+                    go.components[i] = null;
+                }
+                //clear other references
+                go.components.Clear();
+                go.transform = null;
+                go.components = null;
+                go = null;
+            }
+        }
+
+        public static void DestroyTest(GameObject obj)
+        {
+            if(destroyStack != null)
+            {
+                destroyStack.Push(obj);
+            }
+            else
+            {
+                destroyStack = new Stack<GameObject>(2);
+                destroyStack.Push(obj);
+            }
         }
 
         public void Destroy()

@@ -1,6 +1,7 @@
 ﻿using MonogameLearning.BaseComponents;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace MonogameLearning.BaseComponents
 {
@@ -108,6 +109,10 @@ namespace MonogameLearning.BaseComponents
                     GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.LineStrip, 0, 0, indices.Length - 1);
                 }
             }
+        }
+
+        public override void Destroy()
+        {
         }
     }
 }

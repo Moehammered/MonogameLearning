@@ -1,6 +1,7 @@
 ﻿using MonogameLearning.BaseComponents;
 using Microsoft.Xna.Framework;
 using MonogameLearning.GameComponents;
+using System;
 
 namespace MazeEscape.GameComponents
 {
@@ -67,6 +68,10 @@ namespace MazeEscape.GameComponents
                     purComp.Target = null;
                 }
             }
+        }
+
+        public override void Destroy()
+        {
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 
 namespace MonogameLearning.BaseComponents
 {
@@ -101,6 +102,12 @@ namespace MonogameLearning.BaseComponents
             view = Matrix.CreateLookAt(Owner.transform.Position,
                 Owner.transform.Position + Owner.transform.Forward,
                 Owner.transform.Up);
+        }
+
+        public override void Destroy()
+        {
+            if (mainCamera == this)
+                mainCamera = null;
         }
     }
 }

@@ -106,10 +106,25 @@ namespace MazeEscape
                 player.Owner.RemoveComponent<FirstPersonController>();
                 player = null;
             }
+            testObjectCreation();
             base.Update(gameTime);
             collisionService.sweepDynamics();
+            GameObject.ProcessDestroyQueue();
             //keep track of pressed buttons this frame before going to next
             Input.recordInputs();
+        }
+
+        private void testObjectCreation()
+        {
+            if (Input.IsKeyPressed(Keys.I))
+            {
+                GameObject go = new GameObject(this);
+                MeshRendererComponent rend = go.AddComponent<MeshRendererComponent>();
+                rend.Mesh = PrimitiveShape.CreateCube();
+                rend.colour = Color.Purple;
+                go.transform.Position = playerStartPoint + Vector3.Forward;
+                rend.Initialize();
+            }
         }
 
         /// <summary>
@@ -174,7 +189,7 @@ namespace MazeEscape
         {
             levelLoader.loadLevelFiles();
             LevelData level;
-            if (levelLoader.loadLevel("Level1.txt", out level))
+            if (levelLoader.loadLevel("Level0.txt", out level))
             {
                 Console.WriteLine("Constructing level");
                 levelTiles = constructLevel(level);

@@ -58,5 +58,9 @@ namespace MonogameLearning.Pathfinding
         public override void Update(GameTime gameTime)
         {
         }
+
+        public override void Destroy()
+        {
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using MonogameLearning.BaseComponents;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using System;
 
 namespace MonogameLearning.Pathfinding
 {
@@ -95,6 +96,10 @@ namespace MonogameLearning.Pathfinding
                 pathInfo = "No path.";
                 pointInfo = "No path.";
             }
+        }
+
+        public override void Destroy()
+        {
         }
     }
 }

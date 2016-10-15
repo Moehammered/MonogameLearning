@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonogameLearning.Graphics;
 
@@ -68,6 +69,10 @@ namespace MonogameLearning.BaseComponents
         }
 
         public override void Update(GameTime gameTime)
+        {
+        }
+
+        public override void Destroy()
         {
         }
     }
